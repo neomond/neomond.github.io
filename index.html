@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nazrin Atayeva</title>
+<meta name="description" content="Nazrin Atayeva, machine learning engineer for computer vision, 3D perception and LLM agents. MSc in AI for Engineering, University of Sheffield, United Kingdom. Based in Baku, open to remote roles across Europe.">
+<meta name="theme-color" content="#EDF0F3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141B25" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://neomond.github.io/">
+<link rel="canonical" href="https://neomond.github.io/">
+<meta property="og:title" content="Nazrin Atayeva, machine learning engineer">
+<meta property="og:description" content="Computer vision, 3D perception and LLM agents. MSc AI for Engineering, University of Sheffield, United Kingdom.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-1 -1 34 30'%3E%3Cg fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 10H4L12 3H28L20 10M20 26L28 19V3' stroke='%23FF9E00' stroke-width='2.4'/%3E%3Cpath d='M4 26V10L20 26V10' stroke='%23121B28' stroke-width='3.6'/%3E%3C/g%3E%3Ccircle cx='18' cy='6.5' r='2.2' fill='%230000E6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Person","name":"Nazrin Atayeva","jobTitle":"Machine learning engineer","email":"mailto:nazrinatayeva@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Baku","addressCountry":"AZ"},"alumniOf":{"@type":"CollegeOrUniversity","name":"University of Sheffield","address":{"@type":"PostalAddress","addressCountry":"GB"}},"sameAs":["https://github.com/neomond","https://www.linkedin.com/in/nazrin-atayeva"]}
+</script>
+<style>
+/* Layout: left-aligned page on a 5/7 split; the hero's bird's-eye LiDAR panel sits in the right column.
+   Palette is lifted from the nuScenes devkit colour map: car orange, pedestrian blue. */
+:root {
+  --bg: #EDF0F3;
+  --scene: #E1E6EC;
+  --ink: #121B28;
+  --muted: #566376;
+  --rule: #C8D0DA;
+  --signal: #0000E6;
+  --on-ink: #EDF0F3;
+  --point: #1A2535;
+  --car: #FF9E00;
+  --truck: #FF6347;
+  --ped: #0000E6;
+  --bike: #DC143C;
+  --barrier: #708090;
+  --cone: #2F4F4F;
+  --font: "Archivo", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --maxw: 1240px;
+  --gutter: clamp(16px, 4vw, 40px);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141B25; --scene: #0E141C; --ink: #E4E9F0; --muted: #97A3B4; --rule: #2B3546;
+    --signal: #9393FF; --on-ink: #141B25; --point: #C9D3E0; --ped: #8080FF; --barrier: #A3AFBD; --cone: #8DB5B5;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141B25; --scene: #0E141C; --ink: #E4E9F0; --muted: #97A3B4; --rule: #2B3546;
+  --signal: #9393FF; --on-ink: #141B25; --point: #C9D3E0; --ped: #8080FF; --barrier: #A3AFBD; --cone: #8DB5B5;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; overflow-x: clip; }
+body {
+  margin: 0; overflow-x: clip;
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font); font-size: 1.0625rem; line-height: 1.55;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+h1, h2, h3, p, figure { margin: 0; }
+h1, h2, h3 { text-wrap: balance; font-weight: 640; }
+a { color: var(--signal); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; border-radius: 2px; }
+::selection { background: var(--car); color: #121B28; }
+section[id] { scroll-margin-top: 72px; }
+
+.container { width: min(100%, var(--maxw)); margin-inline: auto; padding-inline: var(--gutter); }
+.skip { position: absolute; left: 12px; top: -60px; z-index: 20; background: var(--ink); color: var(--on-ink); padding: 10px 14px; border-radius: 3px; }
+.skip:focus { top: 12px; }
+
+/* nav */
+.nav { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 1px solid transparent; transition: border-color .2s; }
+.nav.is-scrolled { border-bottom-color: var(--rule); }
+.nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 60px; }
+.brand { display: inline-flex; align-items: center; gap: 11px; color: var(--ink); text-decoration: none; font-weight: 650; font-stretch: 112%; font-size: .9375rem; }
+/* logo: an N whose strokes are the front face of a 3D detection box, with the LiDAR sensor on top */
+.logo-mark { width: 38px; height: 33px; flex: none; overflow: visible; }
+.logo-mark path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.lm-n { stroke: var(--ink); stroke-width: 2.8; }
+.lm-box { stroke: var(--car); stroke-width: 1.7; }
+.lm-hidden { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 1.6 2; opacity: .7; }
+.lm-dot { fill: var(--signal); transform-box: fill-box; transform-origin: center; }
+.brand-name { letter-spacing: -.005em; }
+.brand:hover .lm-dot { animation: ping 1.2s ease-out infinite; }
+@keyframes ping { 0% { transform: scale(1); } 40% { transform: scale(1.5); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: no-preference) {
+  .lm-n, .lm-box { stroke-dasharray: 1; stroke-dashoffset: 1; animation: lm-draw 1.4s cubic-bezier(.45, .05, .25, 1) .15s forwards; }
+  .lm-box { animation-delay: .55s; }
+}
+@keyframes lm-draw { to { stroke-dashoffset: 0; } }
+.nav-links { display: flex; gap: clamp(14px, 2.6vw, 30px); list-style: none; margin: 0; padding: 0; font-size: .9375rem; }
+.nav-links a { color: var(--muted); text-decoration: none; }
+.nav-links a:hover { color: var(--ink); }
+
+/* hero */
+.hero { padding-top: clamp(24px, 4.5vw, 56px); padding-bottom: clamp(24px, 4vw, 48px); }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(28px, 4vw, 64px); align-items: start; }
+.hero-copy { display: flex; flex-direction: column; gap: 24px; padding-top: clamp(4px, 2vw, 28px); }
+.name {
+  font-size: clamp(3rem, 6.4vw, 5.6rem); line-height: .88; letter-spacing: -.028em; font-weight: 700;
+  font-stretch: 72%;
+  transition: font-stretch 1.9s cubic-bezier(.16, .84, .24, 1);
+}
+.name span { display: block; }
+.name.is-wide { font-stretch: 125%; }
+.lead { font-size: clamp(1.25rem, 1.9vw, 1.5rem); line-height: 1.28; font-weight: 540; font-stretch: 104%; max-width: 26ch; letter-spacing: -.005em; }
+.intro { color: var(--muted); max-width: 44ch; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn {
+  display: inline-flex; align-items: center; height: 44px; padding: 0 18px;
+  border: 1px solid var(--ink); border-radius: 3px; background: transparent; color: var(--ink);
+  font: inherit; font-size: .9375rem; font-weight: 600; font-stretch: 108%; text-decoration: none; cursor: pointer;
+  transition: background-color .15s, color .15s, border-color .15s;
+}
+.btn:hover { background: var(--ink); color: var(--on-ink); }
+.btn-primary { background: var(--ink); color: var(--on-ink); }
+.btn-primary:hover { background: var(--signal); border-color: var(--signal); color: var(--on-ink); }
+.avail { font-size: .9375rem; color: var(--muted); }
+.avail strong { color: var(--ink); font-weight: 600; }
+
+/* scene */
+.scene { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.scene-panel { position: relative; height: clamp(420px, 44vw, 600px); background: var(--scene); border-radius: 6px; overflow: hidden; }
+.scene-panel canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; }
+.scene-panel canvas.bev-gl, .scene-panel canvas.bev-labels { opacity: 0; transition: opacity .9s ease; }
+.scene-panel canvas.bev-gl { cursor: grab; }
+.scene-panel canvas.bev-gl.is-drag { cursor: grabbing; }
+.scene-panel canvas.bev-labels { pointer-events: none; }
+.scene-panel.is-3d canvas.bev-gl, .scene-panel.is-3d canvas.bev-labels { opacity: 1; }
+.scene-panel #bev { transition: opacity .9s ease; }
+.scene-panel.is-3d #bev { opacity: 0; pointer-events: none; }
+.scene-hint { position: absolute; right: 14px; bottom: 14px; margin: 0; padding: 5px 10px; background: var(--bg); border: 1px solid var(--rule); border-radius: 4px; font-size: .75rem; color: var(--muted); opacity: 0; transition: opacity .6s ease .8s; pointer-events: none; }
+.scene-panel.is-3d .scene-hint { opacity: 1; }
+.scene-ui { position: absolute; top: 14px; left: 14px; right: 14px; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; pointer-events: none; }
+.scene-ui > * { pointer-events: auto; }
+.seg { display: inline-flex; gap: 2px; padding: 3px; background: var(--bg); border: 1px solid var(--rule); border-radius: 4px; }
+.seg button {
+  appearance: none; border: 0; border-radius: 2px; background: transparent; color: var(--muted); cursor: pointer;
+  min-height: 34px; padding: 6px 13px; font: inherit; font-size: .8125rem; font-weight: 620; font-stretch: 100%;
+  transition: background-color .2s, color .2s;
+}
+.seg button:hover { color: var(--ink); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); }
+.readout { display: flex; gap: 18px; margin: 0; padding: 6px 13px; background: var(--bg); border: 1px solid var(--rule); border-radius: 4px; }
+.readout div { display: flex; flex-direction: column; }
+.readout dt { font-size: .75rem; color: var(--muted); line-height: 1.3; }
+.readout dd { margin: 0; font-size: 1.0625rem; line-height: 1.2; font-weight: 680; font-stretch: 112%; font-variant-numeric: tabular-nums; }
+.legend {
+  display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 2px 0 0; padding: 0; list-style: none;
+  font-size: .8125rem; color: var(--muted);
+}
+.legend li { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 12px; height: 9px; border: 2px solid var(--c); border-radius: 1px; }
+.legend i.dash { border-style: dashed; border-width: 1.5px; }
+.legend .lg-student { opacity: 0; visibility: hidden; transition: opacity .4s, visibility .4s; }
+.scene.is-student .legend .lg-student { opacity: 1; visibility: visible; }
+.scene figcaption { font-size: .875rem; color: var(--muted); max-width: 64ch; }
+.scene figcaption strong { color: var(--ink); font-weight: 620; }
+
+/* sections */
+.section { padding-top: clamp(80px, 10vw, 140px); }
+.section-head { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(16px, 4vw, 64px); align-items: end; margin-bottom: clamp(32px, 5vw, 56px); }
+.section-head h2 { font-size: clamp(2.1rem, 3.8vw, 3.1rem); line-height: 1; letter-spacing: -.022em; font-weight: 660; font-stretch: 120%; }
+.section-head p { color: var(--muted); max-width: 52ch; }
+
+/* work: a bento of tiles, each with its own diagram */
+.work { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: clamp(14px, 1.6vw, 22px); }
+.tile { display: grid; gap: clamp(20px, 3vw, 40px); padding: clamp(18px, 2.4vw, 30px); border: 1px solid var(--rule); border-radius: 6px; background: var(--bg); }
+.tile-feature { grid-column: span 12; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+.tile-wide { grid-column: span 12; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+.tile-half { grid-column: span 6; grid-template-rows: 1fr auto; }
+.tile-half .tile-visual { display: flex; flex-direction: column; justify-content: center; }
+.tile-copy { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.tile-copy > p:not(.meta) { max-width: 48ch; }
+.tile-feature .tile-copy { justify-content: center; }
+.meta { font-size: .875rem; color: var(--muted); }
+.tile h3 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.06; letter-spacing: -.016em; font-stretch: 114%; }
+.tile-feature h3 { font-size: clamp(1.7rem, 2.9vw, 2.4rem); }
+.tile-visual { position: relative; min-width: 0; padding: clamp(16px, 2.2vw, 26px); background: var(--scene); border-radius: 4px; overflow: hidden; }
+.vis-title { font-size: .8125rem; font-weight: 620; color: var(--muted); margin-bottom: 16px; }
+.vis-note { margin-top: 12px; font-size: .75rem; color: var(--muted); }
+.stack { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 0; padding: 0; list-style: none; }
+.stack li { padding: 3px 9px; border: 1px solid var(--rule); border-radius: 3px; font-size: .8125rem; color: var(--muted); }
+.points { margin: 4px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: .9375rem; }
+.points li { position: relative; padding-left: 18px; }
+.points li::before { content: ""; position: absolute; left: 0; top: .55em; width: 8px; height: 6px; border: 1.5px solid var(--car); border-radius: 1px; }
+code { font-family: var(--mono); font-size: .84em; }
+
+/* experiment steps, a real sequence */
+.steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 6px 0 0; padding: 0; list-style: none; counter-reset: s; }
+.steps li { position: relative; padding-top: 12px; border-top: 2px solid var(--rule); font-size: .8125rem; line-height: 1.35; color: var(--muted); }
+.steps li::before { counter-increment: s; content: counter(s); display: block; margin-bottom: 2px; font-weight: 700; font-stretch: 112%; color: var(--ink); font-variant-numeric: tabular-nums; }
+.steps li:last-child { border-top-color: var(--ink); }
+
+/* distillation diagram */
+.kd-grid { --gap: clamp(44px, 6vw, 84px); --c: calc((100% - var(--gap)) / 4); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--gap); grid-template-rows: auto 36px auto; }
+.kd-grid b { display: block; font-size: .9375rem; font-weight: 650; font-stretch: 108%; line-height: 1.2; }
+.kd-grid span { display: block; font-size: .78rem; color: var(--muted); line-height: 1.3; }
+.kd-in { padding: 10px 12px; border: 1px dashed var(--muted); border-radius: 4px; background: var(--bg); }
+.kd-cam { grid-area: 1 / 1; } .kd-lidar { grid-area: 1 / 2; }
+.kd-bus { grid-area: 2 / 1 / 3 / 3; position: relative; }
+.kd-bus i { position: absolute; background: var(--muted); }
+.kd-bus .v1, .kd-bus .v2 { top: 0; bottom: 0; width: 1.5px; }
+.kd-bus .v1 { left: var(--c); } .kd-bus .v2 { right: var(--c); }
+.kd-bus .h { top: 50%; height: 1.5px; left: var(--c); right: var(--c); }
+.kd-node { position: relative; padding: 14px; border-radius: 4px; background: var(--bg); border: 1.5px solid var(--ink); }
+.kd-teacher { grid-area: 3 / 1; }
+.kd-right { grid-area: 3 / 2; display: flex; flex-direction: column; align-items: center; }
+.kd-student { width: 86%; border-color: var(--car); }
+.layers { display: grid; gap: 4px; margin-top: 12px; }
+.layers i { display: block; height: 7px; border-radius: 1px; background: var(--ink); opacity: .82; transform-origin: left center; }
+.kd-student .layers i { background: var(--car); opacity: 1; }
+.kd-link { position: absolute; right: 100%; top: 50%; width: calc(var(--gap) + 8.14%); height: 0; border-top: 2px dashed var(--car); transform-origin: left center; }
+.kd-link::after { content: ""; position: absolute; right: -1px; top: -6px; border: 5px solid transparent; border-left: 7px solid var(--car); border-right: 0; }
+.kd-link em { position: absolute; left: 0; right: 0; bottom: 6px; text-align: center; font-style: normal; font-size: .75rem; font-weight: 620; color: var(--ink); }
+.kd-out { width: 86%; margin-top: 30px; position: relative; padding: 10px 12px; border-radius: 4px; background: var(--ink); color: var(--on-ink); }
+.kd-out span { color: inherit; opacity: .75; }
+.kd-out::before { content: ""; position: absolute; left: 50%; bottom: 100%; height: 30px; border-left: 1.25px solid var(--muted); }
+
+/* trace waterfall */
+.spans { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
+.spans li { display: grid; grid-template-columns: minmax(0, 44%) minmax(0, 1fr); align-items: center; gap: 12px; }
+.spans code { padding-left: calc(var(--depth, 1) * 14px); font-size: .78rem; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.spans .root code { padding-left: 0; font-weight: 600; }
+.track { position: relative; height: 18px; border-radius: 2px; background: repeating-linear-gradient(90deg, var(--rule) 0 1px, transparent 1px 20%); }
+.bar { position: absolute; top: 3px; bottom: 3px; left: calc(var(--s) * 1%); width: calc((var(--e) - var(--s)) * 1%); border-radius: 2px; background: var(--signal); transform-origin: left center; }
+.root .bar { background: var(--ink); }
+.llm .bar { background: var(--car); }
+.guard .bar { background: var(--muted); }
+
+/* anomaly signal */
+.sig { display: block; width: 100%; height: auto; overflow: visible; }
+.sig-band { fill: var(--car); opacity: .2; }
+.sig-line { fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linejoin: round; }
+.tracks { display: grid; gap: 6px; margin-top: 14px; }
+.tracks div { display: grid; grid-template-columns: 9.5em minmax(0, 1fr); align-items: center; gap: 10px; font-size: .75rem; color: var(--muted); }
+.tick-row { position: relative; height: 14px; border-bottom: 1px solid var(--rule); }
+.tick-row i { position: absolute; bottom: 0; left: var(--x); width: 3px; height: 12px; margin-left: -1.5px; border-radius: 1px; background: var(--signal); transform-origin: bottom; }
+
+/* leakage-safe window */
+.races { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 4px; }
+.races i { height: 34px; border-radius: 2px; border: 1.5px dashed var(--rule); transition: background-color .35s, border-color .35s; }
+.races i.used { background: var(--ink); border: 1.5px solid var(--ink); opacity: .85; }
+.races i.target { background: var(--car); border: 1.5px solid var(--car); }
+.races-axis { display: flex; justify-content: space-between; margin-top: 6px; font-size: .75rem; color: var(--muted); }
+.key { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 16px 0 0; padding: 0; list-style: none; font-size: .75rem; color: var(--muted); }
+.key li { display: inline-flex; align-items: center; gap: 6px; }
+.key i { width: 12px; height: 12px; border-radius: 2px; }
+.key .used { background: var(--ink); } .key .target { background: var(--car); } .key .future { border: 1.5px dashed var(--muted); }
+
+/* scroll reveals: content is complete without JS; the motion class opts in */
+.motion [data-reveal] { transition: opacity 1s cubic-bezier(.2, .65, .25, 1) var(--d, 0ms), transform 1.2s cubic-bezier(.16, .84, .24, 1) var(--d, 0ms); }
+.motion [data-reveal].is-pending { opacity: .12; transform: translate3d(0, 36px, 0); }
+.motion .section-head h2 { font-stretch: 86%; transition: font-stretch 1.6s cubic-bezier(.16, .84, .24, 1) .1s; }
+.motion .section-head.is-in h2 { font-stretch: 120%; }
+.motion .layers i { transform: scaleX(0); transition: transform .8s cubic-bezier(.16, .84, .24, 1) calc(var(--b, 300ms) + var(--i) * 70ms); }
+.motion .is-in .layers i { transform: none; }
+.motion .kd-bus, .motion .kd-out { opacity: .15; transition: opacity .7s ease var(--b, 200ms); }
+.motion .is-in .kd-bus, .motion .is-in .kd-out { opacity: 1; }
+.motion .kd-link { transform: scaleX(0); transition: transform .8s cubic-bezier(.65, 0, .35, 1) 1.05s; }
+.motion .is-in .kd-link { transform: none; }
+.motion .bar { transform: scaleX(0); transition: transform .7s cubic-bezier(.2, .7, .2, 1) calc(250ms + var(--s) * 16ms); }
+.motion .is-in .bar { transform: none; }
+.motion .sig-line { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 2s cubic-bezier(.45, .05, .25, 1) .25s; }
+.motion .is-in .sig-line { stroke-dashoffset: 0; }
+.motion .sig-band { opacity: .03; transition: opacity .7s ease calc(1.2s + var(--i) * .25s); }
+.motion .is-in .sig-band { opacity: .2; }
+.motion .tick-row i { transform: scaleY(0); transition: transform .45s cubic-bezier(.2, .9, .3, 1.2) calc(1.5s + var(--i) * 90ms); }
+.motion .is-in .tick-row i { transform: none; }
+
+/* experience */
+.timeline { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--rule); }
+.timeline li { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(6px, 4vw, 64px); padding-block: 30px; border-bottom: 1px solid var(--rule); }
+.when { font-size: 1.25rem; line-height: 1.2; font-weight: 660; font-stretch: 120%; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.where { margin-top: 4px; font-size: .9375rem; color: var(--muted); }
+.role { font-size: 1.125rem; font-weight: 640; }
+.timeline li p + p { margin-top: 6px; max-width: 58ch; color: var(--muted); }
+
+/* toolkit: one card per kind of problem, frameworks first */
+.toolkit { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: clamp(14px, 1.6vw, 22px); }
+.tk { display: flex; flex-direction: column; gap: 22px; min-width: 0; padding: clamp(18px, 2.2vw, 26px); border: 1px solid var(--rule); border-radius: 6px; background: var(--bg); }
+.tk-wide { grid-column: span 7; } .tk-narrow { grid-column: span 5; } .tk-third { grid-column: span 4; }
+.tk-focus { background: var(--scene); border-color: var(--scene); }
+.tk-head { display: flex; gap: 16px; align-items: flex-start; }
+.tk-vis { flex: none; width: 64px; height: 40px; overflow: visible; }
+.tk-head h3 { font-size: 1.3rem; line-height: 1.15; letter-spacing: -.01em; font-weight: 660; font-stretch: 114%; }
+.tk-head p { margin-top: 4px; max-width: 40ch; font-size: .9375rem; color: var(--muted); }
+.tk-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.tk-wide .tk-body, .tk-narrow .tk-body { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 24px; }
+.tk-narrow .tk-body { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.tk-label { margin-bottom: 8px; font-size: .75rem; font-weight: 640; color: var(--muted); }
+.fw { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.fw li { display: inline-flex; align-items: center; gap: 7px; padding: 5px 10px 5px 9px; border-radius: 4px; background: var(--scene); font-size: .875rem; font-weight: 620; font-stretch: 104%; }
+.tk-focus .fw li { background: var(--bg); }
+.fw li::before { content: ""; flex: none; width: 8px; height: 6px; border: 1.5px solid var(--car); border-radius: 1px; }
+.sk { margin: 0; padding: 0; list-style: none; font-size: .9375rem; }
+.sk li { padding: 6px 0; border-top: 1px solid var(--rule); }
+.sk li:last-child { border-bottom: 1px solid var(--rule); }
+.tk-used { margin-top: auto; font-size: .8125rem; color: var(--muted); }
+.tk-vis .dots circle, .tk-vis .bar { fill: var(--muted); }
+.tk-vis .hit circle, .tk-vis .hit-dot { fill: var(--car); }
+.tk-vis .draw { fill: none; stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+.tk-vis .acc { stroke: var(--car); } .tk-vis .sig { stroke: var(--signal); } .tk-vis .ink { stroke: var(--ink); }
+.tk-vis .dash { stroke-dasharray: .035 .03; }
+.tk-vis .node { fill: var(--ink); }
+.tk-vis .ring { fill: var(--bg); stroke: var(--signal); stroke-width: 1.5; } .tk-vis .acc-ring { stroke: var(--car); }
+.tk-vis .block { fill: none; stroke: var(--ink); stroke-width: 1.5; } .tk-vis .acc-block { stroke: var(--car); fill: var(--car); fill-opacity: .2; }
+.tk-vis .acc-out { fill: none; stroke: var(--car); stroke-width: 1.5; }
+.tile { scroll-margin-top: 84px; }
+.motion .tk-vis .pop { opacity: .15; transform: scale(.4); transform-box: fill-box; transform-origin: center; transition: opacity .5s ease, transform .6s cubic-bezier(.2, .9, .3, 1.3); transition-delay: calc(var(--d, 0ms) + 380ms + var(--i) * 70ms); }
+.motion .is-in .tk-vis .pop { opacity: 1; transform: none; }
+.motion .tk-vis .draw:not(.dash) { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.1s cubic-bezier(.45, .05, .25, 1) calc(var(--d, 0ms) + 250ms); }
+.motion .is-in .tk-vis .draw:not(.dash) { stroke-dashoffset: 0; }
+.motion .tk-vis .dash { opacity: .1; transition: opacity .8s ease calc(var(--d, 0ms) + 300ms); }
+.motion .is-in .tk-vis .dash { opacity: 1; }
+
+/* contact */
+.contact { padding-block: clamp(80px, 10vw, 140px) clamp(56px, 7vw, 96px); }
+.mail-row { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; }
+.mail {
+  color: var(--ink); font-size: clamp(1.3rem, 5.2vw, 3.5rem); line-height: 1.1; font-weight: 640; font-stretch: 112%; letter-spacing: -.022em;
+  text-decoration-thickness: 2px; text-underline-offset: .14em; overflow-wrap: anywhere;
+}
+.mail:hover { color: var(--signal); text-decoration-thickness: 3px; }
+.contact-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px clamp(20px, 3vw, 40px); margin: 44px 0 0; padding-top: 24px; border-top: 1px solid var(--rule); }
+.contact-meta dt { font-size: .8125rem; font-weight: 640; color: var(--muted); }
+.contact-meta dd { margin: 3px 0 0; font-variant-numeric: tabular-nums; }
+.contact-meta dd a { margin-right: 14px; }
+
+.footer { padding-block: 28px; border-top: 1px solid var(--rule); font-size: .8125rem; color: var(--muted); }
+.footer .container { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; }
+.to-top {
+  display: inline-flex; align-items: center; gap: 10px; height: 40px; padding: 0 16px 0 5px;
+  border: 1px solid var(--rule); border-radius: 999px; background: var(--bg); color: var(--ink); cursor: pointer;
+  font: inherit; font-size: .875rem; font-weight: 620; font-stretch: 106%;
+  transition: border-color .2s, background-color .2s;
+}
+.demo {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; height: 40px; padding: 0 16px 0 5px;
+  border: 1px solid var(--ink); border-radius: 999px; color: var(--ink); text-decoration: none;
+  font-size: .875rem; font-weight: 620; font-stretch: 106%; transition: background-color .2s, color .2s;
+}
+.demo-icon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--car); }
+.demo-icon svg { width: 14px; height: 14px; fill: none; stroke: #121B28; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform .25s cubic-bezier(.3, .7, .2, 1); }
+.demo:hover { background: var(--ink); color: var(--on-ink); }
+.demo:hover .demo-icon svg { transform: translate(1.5px, -1.5px); }
+.to-top-icon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--ink); overflow: hidden; transition: background-color .2s; }
+.to-top-icon svg { width: 14px; height: 14px; fill: none; stroke: var(--on-ink); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.to-top:hover { border-color: var(--ink); }
+.to-top:hover .to-top-icon { background: var(--signal); }
+.to-top:hover .to-top-icon svg { animation: rise .7s cubic-bezier(.3, .7, .2, 1); }
+@keyframes rise { 0% { transform: translateY(0); } 45% { transform: translateY(-18px); } 46% { transform: translateY(18px); } 100% { transform: translateY(0); } }
+
+/* responsive */
+@media (max-width: 900px) {
+  .hero-grid, .section-head, .tile-feature, .tile-wide, .timeline li { grid-template-columns: minmax(0, 1fr); }
+  .tile-half { grid-column: span 12; }
+  .tk-wide, .tk-narrow { grid-column: span 12; }
+  .tk-third { grid-column: span 6; }
+  .tk-third:last-child { grid-column: span 12; }
+  .tile-wide .tile-visual { order: 2; }
+  .scene { margin-inline: calc(-1 * var(--gutter)); }
+  .scene-panel { border-radius: 0; height: 440px; }
+  .scene figcaption, .legend { padding-inline: var(--gutter); max-width: none; }
+  .lead { max-width: 30ch; }
+}
+@media (max-width: 620px) {
+  .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 14px; }
+  .tk-third, .tk-third:last-child { grid-column: span 12; }
+  .tk-wide .tk-body, .tk-narrow .tk-body { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .nav-links .opt { display: none; }
+  .readout { gap: 10px; padding: 5px 9px; }
+  .readout dd { font-size: .9375rem; }
+  .seg button { padding: 6px 9px; }
+  .spans li { grid-template-columns: minmax(0, 52%) minmax(0, 1fr); gap: 8px; }
+  .tracks div { grid-template-columns: 8em minmax(0, 1fr); }
+  .races i { height: 26px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+  .name { font-stretch: 125%; }
+}
+</style>
+<noscript><style>.name { font-stretch: 125%; }</style></noscript>
+</head>
+<body>
+<a class="skip" href="#work">Skip to selected work</a>
+
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="#top" aria-label="Nazrin Atayeva, back to top">
+      <svg class="logo-mark" viewBox="0 0 32 28" aria-hidden="true">
+        <path class="lm-hidden" d="M12 3V19M12 19H28M12 19L4 26"/>
+        <path class="lm-box" pathLength="1" d="M20 10H4L12 3H28L20 10M20 26L28 19V3"/>
+        <path class="lm-n" pathLength="1" d="M4 26V10L20 26V10"/>
+        <circle class="lm-dot" cx="18" cy="6.5" r="1.7"/>
+      </svg>
+      <span class="brand-name">Nazrin Atayeva</span>
+    </a>
+    <nav aria-label="Sections">
+      <ul class="nav-links">
+        <li><a href="#work">Work</a></li>
+        <li class="opt"><a href="#experience">Experience</a></li>
+        <li class="opt"><a href="#toolkit">Toolkit</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero container" aria-label="Introduction">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <h1 class="name"><span>Nazrin</span><span>Atayeva</span></h1>
+        <p class="lead">Machine learning engineer for computer vision, 3D&nbsp;perception and LLM agents.</p>
+        <p class="intro">Before my MSc in AI for Engineering at the University of Sheffield in the United Kingdom, I spent almost three years shipping iOS and React Native apps for banking and telecom. I still work like a product engineer: tests, tracing, and models that run outside a notebook.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="mailto:nazrinatayeva@gmail.com">Email me</a>
+          <a class="btn" href="https://github.com/neomond">GitHub</a>
+          <a class="btn" href="https://www.linkedin.com/in/nazrin-atayeva">LinkedIn</a>
+        </div>
+        <p class="avail"><strong>Based in Baku, UTC+4.</strong> Open to remote roles across Europe.</p>
+      </div>
+
+      <figure class="scene">
+        <div class="scene-panel">
+          <canvas id="bev" role="img" aria-label="Animated bird's-eye view of a simulated LiDAR scan around a car on a city street, with 3D detection boxes for cars, a truck, pedestrians, cyclists and road works."></canvas>
+          <div class="scene-ui">
+            <div class="seg" role="group" aria-label="Detector shown">
+              <button type="button" data-mode="0" aria-pressed="true">Teacher</button>
+              <button type="button" data-mode="1" aria-pressed="false">Student</button>
+            </div>
+            <dl class="readout" aria-label="Objects in this frame">
+              <div><dt>In range</dt><dd id="n-range">0</dd></div>
+              <div><dt>Detected</dt><dd id="n-det">0</dd></div>
+              <div><dt>Confidence</dt><dd id="n-conf">0.00</dd></div>
+            </dl>
+          </div>
+          <p class="scene-hint" aria-hidden="true">Drag to rotate</p>
+        </div>
+        <ul class="legend" aria-label="Box colours">
+          <li><i style="--c: var(--car)"></i>Car</li>
+          <li><i style="--c: var(--truck)"></i>Truck</li>
+          <li><i style="--c: var(--ped)"></i>Pedestrian</li>
+          <li><i style="--c: var(--bike)"></i>Bicycle</li>
+          <li><i style="--c: var(--barrier)"></i>Barrier</li>
+          <li><i style="--c: var(--cone)"></i>Cone</li>
+          <li class="lg-student"><i class="dash" style="--c: var(--ink)"></i>Teacher's box</li>
+          <li class="lg-student"><i class="dash" style="--c: var(--muted)"></i>Missed</li>
+        </ul>
+        <figcaption><strong id="mode-note">Teacher: BEVFusion, the full-size camera and LiDAR model. Boxes are tight, steady and confident.</strong> A simulated 32-beam LiDAR scan, showing the detection task from my MSc dissertation. Rings are 10&nbsp;m apart.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="work" class="section container" aria-labelledby="work-title">
+    <div class="section-head" data-reveal>
+      <h2 id="work-title">Selected work</h2>
+      <p>Four projects across 3D perception, LLM agents and time-series machine learning. The code lives on <a href="https://github.com/neomond">GitHub</a>.</p>
+    </div>
+
+    <div class="work">
+      <article class="tile tile-feature" id="proj-kd" data-reveal aria-labelledby="diss-title">
+        <div class="tile-copy">
+          <p class="meta">MSc dissertation, University of Sheffield, United Kingdom, 2026</p>
+          <h3 id="diss-title">Knowledge distillation for BEVFusion</h3>
+          <p>BEVFusion merges camera images and LiDAR into one bird's-eye-view map to find cars, people and obstacles in 3D. It is accurate and heavy. I distilled it into a compact student built from YOLO and PointPillars, and benchmarked it on nuScenes.</p>
+          <ol class="steps" aria-label="Experiments, in the order I ran them">
+            <li>Student on its own</li>
+            <li>Class weights for rare objects</li>
+            <li>Learning from the teacher</li>
+            <li>Both combined</li>
+          </ol>
+          <ul class="stack" aria-label="Stack">
+            <li>PyTorch</li><li>nuScenes</li><li>Docker</li><li>CUDA</li><li>RTX 3090</li>
+          </ul>
+        </div>
+        <div class="tile-visual kd" aria-label="Diagram: camera and LiDAR feed both the BEVFusion teacher and the smaller student; the teacher distils into the student, which outputs 3D boxes." role="img">
+          <div class="kd-grid">
+            <div class="kd-in kd-cam"><b>Camera</b><span>6 surround views</span></div>
+            <div class="kd-in kd-lidar"><b>LiDAR</b><span>Point cloud</span></div>
+            <div class="kd-bus" aria-hidden="true"><i class="v1"></i><i class="v2"></i><i class="h"></i></div>
+            <div class="kd-node kd-teacher" style="--b: 300ms">
+              <b>BEVFusion</b><span>Teacher</span>
+              <div class="layers" aria-hidden="true"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2;width:92%"></i><i style="--i:3"></i><i style="--i:4;width:96%"></i><i style="--i:5"></i><i style="--i:6;width:90%"></i><i style="--i:7"></i></div>
+            </div>
+            <div class="kd-right">
+            <div class="kd-node kd-student" style="--b: 1500ms">
+              <span class="kd-link" aria-hidden="true"><em>distils</em></span>
+              <b>YOLO + PointPillars</b><span>Student, 5.5M parameters</span>
+              <div class="layers" aria-hidden="true"><i style="--i:0"></i><i style="--i:1;width:88%"></i><i style="--i:2"></i></div>
+            </div>
+            <div class="kd-out" style="--b: 1900ms"><b>3D boxes</b><span>Bird's-eye view</span></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="tile tile-wide" id="proj-agent" data-reveal aria-labelledby="p-agent">
+        <div class="tile-visual">
+          <p class="vis-title">One agent turn, traced with OpenTelemetry</p>
+          <ol class="spans" aria-label="Trace spans">
+            <li class="root" style="--s:0;--e:100"><code>agent.turn</code><span class="track"><span class="bar"></span></span></li>
+            <li style="--s:3;--e:17"><code>compare_pace</code><span class="track"><span class="bar"></span></span></li>
+            <li style="--s:17;--e:36"><code>get_tyre_degradation</code><span class="track"><span class="bar"></span></span></li>
+            <li style="--s:36;--e:57"><code>simulate_pit_window</code><span class="track"><span class="bar"></span></span></li>
+            <li class="llm" style="--s:57;--e:89"><code>llm.generate</code><span class="track"><span class="bar"></span></span></li>
+            <li class="guard" style="--s:89;--e:98"><code>guardrail.check</code><span class="track"><span class="bar"></span></span></li>
+          </ol>
+          <p class="vis-note">Span order is real; timings are illustrative.</p>
+        </div>
+        <div class="tile-copy">
+          <p class="meta">Agentic LLM system</p>
+          <h3 id="p-agent">Race Engineer Agent</h3>
+          <p>An LLM that plays Formula&nbsp;1 race engineer. It reads FastF1 timing data, calls tools to compare pace, model tyre wear and simulate pit windows, then decides what to tell the driver, including when to say nothing.</p>
+          <ul class="points">
+            <li>Runs on Gemini, or locally on Qwen&nbsp;3 14B</li>
+            <li>Guardrails against repeated messages and bad pit calls</li>
+            <li>Instrumented end to end and covered by tests</li>
+          </ul>
+          <ul class="stack" aria-label="Stack">
+            <li>Python</li><li>FastF1</li><li>Ollama</li><li>OpenTelemetry</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="tile tile-half" id="proj-anomaly" data-reveal aria-labelledby="p-anomaly">
+        <div class="tile-visual">
+          <p class="vis-title">Three detectors on the same sensor channel</p>
+          <svg class="sig" viewBox="0 0 600 150" aria-hidden="true">
+            <rect class="sig-band" style="--i:0" x="140" y="0" width="36" height="150" rx="3"/>
+            <rect class="sig-band" style="--i:1" x="294" y="0" width="72" height="150" rx="3"/>
+            <rect class="sig-band" style="--i:2" x="460" y="0" width="56" height="150" rx="3"/>
+            <path class="sig-line" pathLength="1" d="M0 83.9 L4 85.7 L8 90.2 L12 88.4 L16 91.0 L20 89.7 L24 87.2 L28 88.2 L32 84.6 L36 85.5 L40 83.0 L44 83.0 L48 85.1 L52 88.2 L56 86.3 L60 88.9 L64 93.1 L68 96.9 L72 96.9 L76 97.4 L80 100.9 L84 95.9 L88 98.7 L92 93.7 L96 90.0 L100 86.2 L104 83.1 L108 81.4 L112 74.2 L116 72.5 L120 69.7 L124 66.1 L128 65.5 L132 62.4 L136 62.6 L140 64.1 L144 67.6 L148 66.7 L152 53.2 L156 21.2 L160 37.2 L164 65.0 L168 71.3 L172 69.5 L176 65.4 L180 65.0 L184 62.6 L188 62.3 L192 60.1 L196 57.0 L200 60.4 L204 57.0 L208 60.3 L212 64.7 L216 65.1 L220 70.7 L224 72.6 L228 80.0 L232 84.3 L236 86.7 L240 90.9 L244 89.9 L248 92.8 L252 92.4 L256 91.8 L260 90.1 L264 90.7 L268 89.9 L272 86.3 L276 86.5 L280 83.3 L284 86.9 L288 87.6 L292 90.9 L296 91.9 L300 97.4 L304 111.9 L308 121.0 L312 118.9 L316 121.5 L320 119.5 L324 117.8 L328 115.2 L332 115.6 L336 108.6 L340 105.1 L344 101.5 L348 99.9 L352 92.3 L356 85.1 L360 71.5 L364 65.8 L368 65.0 L372 65.5 L376 63.5 L380 65.5 L384 66.6 L388 70.6 L392 72.0 L396 68.6 L400 68.7 L404 68.3 L408 67.0 L412 66.6 L416 65.1 L420 61.5 L424 58.4 L428 59.1 L432 58.2 L436 59.3 L440 62.3 L444 63.0 L448 64.9 L452 69.0 L456 73.3 L460 74.4 L464 82.9 L468 84.5 L472 71.0 L476 85.0 L480 107.0 L484 107.3 L488 83.2 L492 74.3 L496 87.5 L500 105.5 L504 97.3 L508 76.8 L512 85.3 L516 83.5 L520 83.6 L524 85.3 L528 86.5 L532 89.6 L536 89.8 L540 96.0 L544 96.2 L548 94.8 L552 95.5 L556 95.3 L560 93.8 L564 90.0 L568 90.4 L572 87.2 L576 80.4 L580 76.3 L584 70.2 L588 66.7 L592 65.1 L596 62.6 L600 64.2"/>
+          </svg>
+          <div class="tracks" aria-hidden="true">
+            <div>Isolation Forest<span class="tick-row"><i style="--x:26%;--i:0"></i><i style="--x:51%;--i:1"></i><i style="--x:56%;--i:2"></i><i style="--x:59%;--i:3"></i></span></div>
+            <div>One-Class SVM<span class="tick-row"><i style="--x:25.5%;--i:1"></i><i style="--x:27%;--i:2"></i><i style="--x:40%;--i:3"></i><i style="--x:79%;--i:4"></i><i style="--x:83%;--i:5"></i></span></div>
+            <div>LSTM autoencoder<span class="tick-row"><i style="--x:26%;--i:2"></i><i style="--x:50.5%;--i:3"></i><i style="--x:57%;--i:4"></i><i style="--x:78%;--i:5"></i><i style="--x:81.5%;--i:6"></i><i style="--x:85%;--i:7"></i></span></div>
+          </div>
+          <p class="vis-note">Illustration of the comparison view.</p>
+        </div>
+        <div class="tile-copy">
+          <p class="meta">Time-series anomaly detection</p>
+          <h3 id="p-anomaly">Sensor anomaly detection</h3>
+          <p>Flags faults in Formula&nbsp;1 sensor telemetry. Three detectors run side by side, so you can see where they agree and where they don't.</p>
+          <a class="demo" href="https://f1-sensor-anomaly-detection-zrgyd6krbr8rdvyxuwn8ku.streamlit.app" target="_blank" rel="noopener noreferrer"><span class="demo-icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M7 3.5H3.5v9h9V9M9.5 3.5h3v3M12.5 3.5L7.5 8.5"/></svg></span>Open live demo</a>
+          <ul class="stack" aria-label="Stack">
+            <li>Python</li><li>Isolation Forest</li><li>One-Class SVM</li><li>LSTM</li><li>Streamlit</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="tile tile-half" id="proj-points" data-reveal style="--d: 140ms" aria-labelledby="p-points">
+        <div class="tile-visual">
+          <p class="vis-title">Features for a race come only from races before it</p>
+          <div class="races" id="races" aria-hidden="true">
+            <i class="used"></i><i class="used"></i><i class="used"></i><i class="used"></i><i class="used"></i><i class="used"></i><i class="used"></i><i class="used"></i><i class="used"></i><i class="used"></i><i class="target"></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+          <div class="races-axis" aria-hidden="true"><span>Earlier races</span><span>Later races</span></div>
+          <ul class="key">
+            <li><i class="used"></i>Used for features</li>
+            <li><i class="target"></i>Race being predicted</li>
+            <li><i class="future"></i>Not yet run</li>
+          </ul>
+        </div>
+        <div class="tile-copy">
+          <p class="meta">Tabular classification</p>
+          <h3 id="p-points">Points-finish predictor</h3>
+          <p>Predicts whether a driver finishes in the points, using only what was known before each race. I also tracked how the model holds up as the sport changes over time.</p>
+          <a class="demo" href="https://f1-points-predictor-iq5km2fmjbqvkjbkxrn3pe.streamlit.app" target="_blank" rel="noopener noreferrer"><span class="demo-icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M7 3.5H3.5v9h9V9M9.5 3.5h3v3M12.5 3.5L7.5 8.5"/></svg></span>Open live demo</a>
+          <ul class="stack" aria-label="Stack">
+            <li>Python</li><li>Feature engineering</li><li>Drift analysis</li><li>Streamlit</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="experience" class="section container" aria-labelledby="exp-title">
+    <div class="section-head" data-reveal>
+      <h2 id="exp-title">Experience</h2>
+      <p>I moved into machine learning after almost three years as a mobile engineer. Production apps taught me to test, measure and ship.</p>
+    </div>
+    <ol class="timeline">
+      <li data-reveal style="--d: 0ms">
+        <div><p class="when">Until 2025</p><p class="where">Unibank, Azerconnect, Morpho</p></div>
+        <div><p class="role">Mobile engineer</p><p>iOS apps in UIKit and SwiftUI, and cross-platform apps in React Native, for banking and telecom products used in production.</p></div>
+      </li>
+      <li data-reveal style="--d: 110ms">
+        <div><p class="when">2025–2026</p><p class="where">University of Sheffield, United Kingdom</p></div>
+        <div><p class="role">MSc Artificial Intelligence for Engineering</p><p>Distinction, 74% overall. Dissertation on knowledge distillation for camera and LiDAR 3D object detection. Degree conferred January 2027.</p></div>
+      </li>
+      <li data-reveal style="--d: 220ms">
+        <div><p class="when">Now</p><p class="where">Baku, working remotely</p></div>
+        <div><p class="role">Looking for my next role</p><p>Machine learning, computer vision and AI engineering, remote across Europe.</p></div>
+      </li>
+    </ol>
+  </section>
+
+  <section id="toolkit" class="section container" aria-labelledby="tool-title">
+    <div class="section-head" data-reveal>
+      <h2 id="tool-title">Toolkit</h2>
+      <p>The frameworks I build with, grouped by the kind of problem they solve.</p>
+    </div>
+    <div class="toolkit">
+      <article class="tk tk-wide tk-focus" data-reveal aria-labelledby="tk-perception">
+        <div class="tk-head">
+          <svg class="tk-vis" viewBox="0 0 64 40" aria-hidden="true">
+            <g class="dots"><circle class="pop" style="--i:0" cx="4" cy="35" r="1.3"/><circle class="pop" style="--i:1" cx="10" cy="36" r="1.3"/><circle class="pop" style="--i:2" cx="47" cy="36" r="1.3"/><circle class="pop" style="--i:3" cx="53" cy="35" r="1.3"/><circle class="pop" style="--i:4" cx="59" cy="34" r="1.3"/><circle class="pop" style="--i:1" cx="6" cy="29" r="1.3"/><circle class="pop" style="--i:4" cx="56" cy="28" r="1.3"/></g>
+            <g class="hit"><circle class="pop" style="--i:2" cx="19" cy="27" r="1.4"/><circle class="pop" style="--i:3" cx="25" cy="28" r="1.4"/><circle class="pop" style="--i:4" cx="31" cy="27" r="1.4"/><circle class="pop" style="--i:5" cx="22" cy="21" r="1.4"/><circle class="pop" style="--i:6" cx="29" cy="21" r="1.4"/></g>
+            <path class="draw acc" pathLength="1" d="M14 16h22v16H14zM14 16l7-6h22l-7 6M36 32l7-6V10"/>
+          </svg>
+          <div><h3 id="tk-perception">Perception</h3><p>Finding and locating objects in 3D from camera images and LiDAR.</p></div>
+        </div>
+        <div class="tk-body">
+          <div><p class="tk-label">Frameworks</p><ul class="fw"><li>PyTorch</li><li>CUDA</li><li>YOLO</li><li>PointPillars</li><li>nuScenes</li></ul></div>
+          <div><p class="tk-label">Skills</p><ul class="sk"><li>3D object detection</li><li>Camera and LiDAR fusion</li><li>Knowledge distillation</li></ul></div>
+        </div>
+        <p class="tk-used">Used in <a href="#proj-kd">my MSc dissertation</a></p>
+      </article>
+
+      <article class="tk tk-narrow" data-reveal style="--d: 100ms" aria-labelledby="tk-ml">
+        <div class="tk-head">
+          <svg class="tk-vis" viewBox="0 0 64 40" aria-hidden="true">
+            <ellipse class="draw sig dash" pathLength="1" cx="22" cy="24" rx="17" ry="11"/>
+            <g class="dots"><circle class="pop" style="--i:0" cx="14" cy="24" r="1.5"/><circle class="pop" style="--i:1" cx="19" cy="20" r="1.5"/><circle class="pop" style="--i:2" cx="24" cy="27" r="1.5"/><circle class="pop" style="--i:3" cx="28" cy="21" r="1.5"/><circle class="pop" style="--i:4" cx="20" cy="29" r="1.5"/><circle class="pop" style="--i:5" cx="31" cy="26" r="1.5"/><circle class="pop" style="--i:2" cx="16" cy="18" r="1.5"/></g>
+            <circle class="pop hit-dot" style="--i:7" cx="52" cy="10" r="1.8"/>
+            <circle class="draw acc" pathLength="1" cx="52" cy="10" r="5.5"/>
+          </svg>
+          <div><h3 id="tk-ml">Machine learning</h3><p>Models for tabular and time-series data, from features to evaluation.</p></div>
+        </div>
+        <div class="tk-body">
+          <div><p class="tk-label">Frameworks</p><ul class="fw"><li>scikit-learn</li><li>pandas</li><li>NumPy</li><li>MATLAB</li></ul></div>
+          <div><p class="tk-label">Skills</p><ul class="sk"><li>Anomaly detection</li><li>Time-series analysis</li><li>Feature engineering</li></ul></div>
+        </div>
+        <p class="tk-used">Used in <a href="#proj-anomaly">anomaly detection</a> and <a href="#proj-points">the points predictor</a></p>
+      </article>
+
+      <article class="tk tk-third" data-reveal aria-labelledby="tk-llm">
+        <div class="tk-head">
+          <svg class="tk-vis" viewBox="0 0 64 40" aria-hidden="true">
+            <path class="draw sig" pathLength="1" d="M16 20L46 8M16 20L50 20M16 20L46 32"/>
+            <circle class="pop node" style="--i:0" cx="14" cy="20" r="4.5"/>
+            <circle class="pop ring" style="--i:2" cx="47" cy="8" r="3.2"/><circle class="pop ring" style="--i:3" cx="51" cy="20" r="3.2"/><circle class="pop ring acc-ring" style="--i:4" cx="47" cy="32" r="3.2"/>
+          </svg>
+          <div><h3 id="tk-llm">LLM systems</h3><p>Agents that call tools, stay on task and can be traced.</p></div>
+        </div>
+        <div class="tk-body">
+          <div><p class="tk-label">Frameworks</p><ul class="fw"><li>Gemini API</li><li>Ollama</li><li>OpenTelemetry</li></ul></div>
+          <div><p class="tk-label">Skills</p><ul class="sk"><li>Tool-calling agents</li><li>Guardrails</li><li>Local models</li></ul></div>
+        </div>
+        <p class="tk-used">Used in <a href="#proj-agent">Race Engineer Agent</a></p>
+      </article>
+
+      <article class="tk tk-third" data-reveal style="--d: 100ms" aria-labelledby="tk-eng">
+        <div class="tk-head">
+          <svg class="tk-vis" viewBox="0 0 64 40" aria-hidden="true">
+            <rect class="pop block" style="--i:0" x="3" y="14" width="14" height="12" rx="2"/>
+            <rect class="pop block" style="--i:2" x="25" y="14" width="14" height="12" rx="2"/>
+            <rect class="pop block acc-block" style="--i:4" x="47" y="14" width="14" height="12" rx="2"/>
+            <path class="draw sig" pathLength="1" d="M18 20h6M40 20h6"/>
+          </svg>
+          <div><h3 id="tk-eng">Engineering</h3><p>Getting models out of notebooks and into tested, shippable code.</p></div>
+        </div>
+        <div class="tk-body">
+          <div><p class="tk-label">Frameworks</p><ul class="fw"><li>Python</li><li>Docker</li><li>Git</li><li>pytest</li><li>Streamlit</li></ul></div>
+          <div><p class="tk-label">Skills</p><ul class="sk"><li>Automated testing</li><li>Cloud GPU training</li><li>SQL</li></ul></div>
+        </div>
+        <p class="tk-used">Used in <a href="#work">every project</a></p>
+      </article>
+
+      <article class="tk tk-third" data-reveal style="--d: 200ms" aria-labelledby="tk-mobile">
+        <div class="tk-head">
+          <svg class="tk-vis" viewBox="0 0 64 40" aria-hidden="true">
+            <rect class="draw ink" pathLength="1" x="22" y="3" width="20" height="34" rx="4"/>
+            <rect class="pop bar" style="--i:1" x="26" y="10" width="12" height="3" rx="1"/>
+            <rect class="pop bar" style="--i:2" x="26" y="16" width="8" height="3" rx="1"/>
+            <rect class="pop acc-out" style="--i:4" x="26" y="23" width="12" height="8" rx="1.5"/>
+          </svg>
+          <div><h3 id="tk-mobile">Mobile</h3><p>Almost three years of production iOS and React Native apps.</p></div>
+        </div>
+        <div class="tk-body">
+          <div><p class="tk-label">Frameworks</p><ul class="fw"><li>Swift</li><li>SwiftUI</li><li>UIKit</li><li>React Native</li></ul></div>
+          <div><p class="tk-label">Skills</p><ul class="sk"><li>Banking and telecom apps</li><li>Shipping to production</li></ul></div>
+        </div>
+        <p class="tk-used">Used at <a href="#experience">Unibank, Azerconnect and Morpho</a></p>
+      </article>
+    </div>
+  </section>
+
+  <section id="contact" class="contact container" aria-labelledby="contact-title">
+    <div class="section-head" data-reveal>
+      <h2 id="contact-title">Contact</h2>
+      <p>Hiring for machine learning, computer vision or AI engineering? Email is the fastest way to reach me.</p>
+    </div>
+    <div class="mail-row" data-reveal>
+      <a class="mail" href="mailto:nazrinatayeva@gmail.com">nazrinatayeva@gmail.com</a>
+      <button class="btn" type="button" id="copy-mail">Copy address</button>
+    </div>
+    <dl class="contact-meta" data-reveal style="--d: 120ms">
+      <div><dt>Location</dt><dd>Baku, Azerbaijan</dd></div>
+      <div><dt>Local time</dt><dd><span data-baku-time>--:--</span> in Baku</dd></div>
+      <div><dt>Elsewhere</dt><dd><a href="https://github.com/neomond">GitHub</a><a href="https://www.linkedin.com/in/nazrin-atayeva">LinkedIn</a></dd></div>
+    </dl>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <span>© 2026 Nazrin Atayeva</span>
+    <button class="to-top" type="button" id="to-top">
+      <span class="to-top-icon" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 12.5V3.5M4 7.5L8 3.5L12 7.5"/></svg></span>
+      Back to top
+    </button>
+  </div>
+</footer>
+
+<script>
+/* ---------- page chrome ---------- */
+(function () {
+  var nav = document.querySelector('.nav'), ticking = false;
+  function onScroll() {
+    if (ticking) return; ticking = true;
+    requestAnimationFrame(function () { nav.classList.toggle('is-scrolled', window.scrollY > 4); ticking = false; });
+  }
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  // the name stretches from condensed to expanded once the variable font is in
+  var name = document.querySelector('.name');
+  var widen = function () { requestAnimationFrame(function () { requestAnimationFrame(function () { name.classList.add('is-wide'); }); }); };
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !document.fonts || !document.fonts.load) name.classList.add('is-wide');
+  else Promise.race([document.fonts.load('700 80px Archivo'), new Promise(function (r) { setTimeout(r, 1800); })]).then(widen, widen);
+
+  // Baku clock
+  var fmt = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Baku' });
+  function tick() {
+    try { var t = fmt.format(new Date()); document.querySelectorAll('[data-baku-time]').forEach(function (el) { el.textContent = t; }); } catch (e) { /* keep the static text */ }
+  }
+  tick(); setInterval(tick, 20000);
+
+  var toTop = document.getElementById('to-top');
+  toTop.addEventListener('click', function () {
+    var smooth = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
+    document.querySelector('.brand').focus({ preventScroll: true });
+  });
+
+  var copyBtn = document.getElementById('copy-mail'), t;
+  copyBtn.addEventListener('click', function () {
+    var done = function (msg) { copyBtn.textContent = msg; clearTimeout(t); t = setTimeout(function () { copyBtn.textContent = 'Copy address'; }, 2400); };
+    try {
+      navigator.clipboard.writeText('nazrinatayeva@gmail.com').then(function () { done('Copied'); }, function () { done('Select the address to copy'); });
+    } catch (e) { done('Select the address to copy'); }
+  });
+})();
+
+/* ---------- LiDAR scene: simulation, 2D fallback view, hooks for the 3D view ---------- */
+(function () {
+  var canvas = document.getElementById('bev');
+  var ctx = canvas && canvas.getContext ? canvas.getContext('2d') : null;
+  if (!ctx) return;
+  var panel = canvas.parentElement;
+
+  var TAU = Math.PI * 2;
+  var P = 180, R_MAX = 50, RANGE = 44;                  // world tile length, sensor range, counted range (m)
+  var WALL_R = 14, WALL_L = -16, CURB_R = 9.25, CURB_L = -11.25, SIDE_X = 42;
+  var CROSS = [[54, 68], [128, 140]];                  // side streets, as world y spans
+  var EGO_V = 8, OMEGA = 1.5, DECAY = 1.55, FLOOR = 0.2;     // ego drives at about 29 km/h
+
+  var seed = 20261121;
+  function rnd() { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
+  function rr(a, b) { return a + (b - a) * rnd(); }
+  function mod(a, n) { return ((a % n) + n) % n; }
+  function wrapRel(d) { return mod(d + P / 2, P) - P / 2; }
+  function normA(a) { return mod(a + Math.PI, TAU) - Math.PI; }
+  function smooth(e0, e1, x) { var t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0))); return t * t * (3 - 2 * t); }
+  function crossAt(yw) { var m = mod(yw, P); for (var i = 0; i < CROSS.length; i++) if (m > CROSS[i][0] && m < CROSS[i][1]) return CROSS[i]; return null; }
+  function nearCross(yw, before, after) { var m = mod(yw, P); for (var i = 0; i < CROSS.length; i++) if (m > CROSS[i][0] - before && m < CROSS[i][1] + after) return true; return false; }
+
+  /* angle bins: phi is measured clockwise from straight ahead, x = r sin(phi), y = r cos(phi) */
+  var NB = 480, BW = TAU / NB;
+  function binOf(phi) { var j = Math.floor((phi + Math.PI) / BW); return j < 0 ? 0 : j >= NB ? NB - 1 : j; }
+  function binPhi(j) { return -Math.PI + (j + 0.5) * BW; }
+  var limit = new Float32Array(NB), shadow = new Float32Array(NB), inten = new Float32Array(NB);
+  var binSin = new Float32Array(NB), binCos = new Float32Array(NB);
+  for (var j0 = 0; j0 < NB; j0++) { binSin[j0] = Math.sin(binPhi(j0)); binCos[j0] = Math.cos(binPhi(j0)); }
+
+  /* ---- static structures: facades, side streets, curbs, trees, poles ---- */
+  var sx_ = [], sy_ = [], sh_ = [], sk_ = [];           // k: 0 wall, 1 curb, 2 canopy, 3 pole
+  function addS(x, y, k) { sx_.push(x); sy_.push(mod(y, P)); sh_.push(rnd()); sk_.push(k); }
+  function facade(side) {
+    var base = side > 0 ? WALL_R : WALL_L, y = 0, prev = null, offs = [0, 0.5, -0.35, 0.9, 0.2];
+    while (y < P) {
+      var len = rr(6, 15), x = base + offs[Math.floor(rnd() * offs.length)] * side;
+      if (prev !== null && !crossAt(y)) for (var t = Math.min(prev, x); t <= Math.max(prev, x); t += 0.12) addS(t, y, 0);
+      for (var yy = y; yy < Math.min(P, y + len); yy += 0.2) if (!crossAt(yy)) addS(x + (rnd() - 0.5) * 0.06, yy, 0);
+      prev = x; y += len;
+    }
+  }
+  facade(1); facade(-1);
+  CROSS.forEach(function (c) {
+    [1, -1].forEach(function (side) {
+      for (var x = side > 0 ? WALL_R : WALL_L; Math.abs(x) <= SIDE_X; x += 0.22 * side) { addS(x, c[0], 0); addS(x, c[1], 0); }
+      for (var x2 = side > 0 ? CURB_R : CURB_L; Math.abs(x2) <= SIDE_X; x2 += 0.3 * side) { addS(x2, c[0] + 2.5, 1); addS(x2, c[1] - 2.5, 1); }
+    });
+  });
+  for (var cy0 = 0; cy0 < P; cy0 += 0.3) {
+    var c0 = crossAt(cy0), m0 = mod(cy0, P);
+    if (!(c0 && m0 > c0[0] + 2.5 && m0 < c0[1] - 2.5)) { addS(CURB_R, cy0, 1); addS(CURB_L, cy0, 1); }
+  }
+  for (var ty = 4; ty < P; ty += rr(12, 17)) if (!nearCross(ty, 3, 3)) {
+    var tr = rr(1.3, 1.9), tx = -12.7 + rr(-0.3, 0.3);
+    for (var ti = 0; ti < 46; ti++) { var a = rnd() * TAU, rad = tr * Math.sqrt(0.25 + 0.75 * rnd()); addS(tx + Math.sin(a) * rad, ty + Math.cos(a) * rad, 2); }
+  }
+  for (var py = 9; py < P; py += 18) if (!nearCross(py, 2, 2)) for (var pi = 0; pi < 6; pi++) addS(9.8 + (rnd() - 0.5) * 0.2, py + (rnd() - 0.5) * 0.2, 3);
+  var sN = sx_.length, sX = new Float32Array(sx_), sY = new Float32Array(sy_), sH = new Float32Array(sh_), sK = new Uint8Array(sk_);
+
+  /* ---- road users ---- */
+  var CLS = {
+    car:     { w: 1.9, l: 4.5, far: 40, miss: 0.18, label: 'car' },
+    truck:   { w: 2.5, l: 8.2, far: 50, miss: 0.04, label: 'truck' },
+    ped:     { w: 0.6, l: 0.6, far: 26, miss: 0.4,  label: 'pedestrian', round: 0.28 },
+    bike:    { w: 0.6, l: 1.75, far: 30, miss: 0.3, label: 'bicycle' },
+    barrier: { w: 0.4, l: 2.0, far: 30, miss: 0.35, label: 'barrier' },
+    cone:    { w: 0.4, l: 0.4, far: 20, miss: 0.5,  label: 'traffic_cone', round: 0.2 }
+  };
+  var LABELED = { car: 1, truck: 1, ped: 1, bike: 1 };
+  var objs = [];
+  function surface(o, c) {
+    var out = [], i, k, t, jit;
+    if (c.round) {
+      var n = Math.max(12, Math.round(TAU * c.round / 0.06));
+      for (i = 0; i < n; i++) { var a = i / n * TAU; for (k = 0; k < 2; k++) { var rj = c.round + (rnd() - 0.5) * 0.06; out.push(Math.sin(a) * rj, Math.cos(a) * rj, Math.sin(a), Math.cos(a), rnd()); } }
+    } else {
+      var hw = o.w / 2, hl = o.l / 2;
+      var edges = [[-hw, hl, hw, hl, 0, 1], [hw, hl, hw, -hl, 1, 0], [hw, -hl, -hw, -hl, 0, -1], [-hw, -hl, -hw, hl, -1, 0]];
+      edges.forEach(function (e) {
+        var len = Math.hypot(e[2] - e[0], e[3] - e[1]), n2 = Math.max(2, Math.round(len / 0.09));
+        for (i = 0; i <= n2; i++) { t = i / n2; for (k = 0; k < 2; k++) { jit = (rnd() - 0.5) * 0.05; out.push(e[0] + (e[2] - e[0]) * t + e[4] * jit, e[1] + (e[3] - e[1]) * t + e[5] * jit, e[4], e[5], rnd()); } }
+      });
+    }
+    return new Float32Array(out);
+  }
+  function addO(cls, x, y, v, yaw) {
+    var c = CLS[cls];
+    var o = {
+      cls: cls, x: x, y: mod(y, P), v: v, w: c.w * rr(0.94, 1.06), l: c.l * rr(0.94, 1.06),
+      yaw: yaw !== undefined ? yaw : (v < 0 ? Math.PI : 0),
+      confT: rr(0.84, 0.98), missed: rnd() < c.miss,
+      ndx: rr(-0.55, 0.55), ndy: rr(-0.85, 0.85), nyaw: rr(-0.12, 0.12), nsw: rr(-0.14, 0.14), nsl: rr(-0.13, 0.13),
+      rx: 0, ry: 0, r: 0, phi: 0, inRange: false, vis: false, det: 0, detT: 0, bx: 0, by: 0, byaw: 0, bw: 0, bl: 0,
+      m: 0, m0: 0, tW: 0, sW: 0, ph: rnd() * TAU
+    };
+    o.confS = Math.max(0.31, o.confT - rr(0.1, 0.38));
+    o.pts = surface(o, c);
+    objs.push(o);
+    return o;
+  }
+  var egoY = 24, i;
+  // cars in the ego lane keep a following gap that opens and closes, like real traffic
+  [[14, 5, 0.33], [-15, 4, 0.27], [72, 6, 0.2], [-78, 6, 0.22]].forEach(function (g) {
+    var o = addO('car', 0, egoY + g[0], EGO_V);
+    o.follow = { d: g[0], amp: g[1], w: g[2], ph: rnd() * TAU };
+  });
+  for (i = 0; i < 5; i++) addO(i === 2 ? 'truck' : 'car', 3.5, i * 36 + rr(-5, 5), 10.5);
+  for (i = 0; i < 6; i++) addO('car', -3.5, i * 30 + rr(-4, 4), -6);
+  addO('truck', -7, 20, -4.5); addO('car', -7, 70, -4.5); addO('car', -7, 115, -4.5); addO('car', -7, 160, -4.5);
+  addO('bike', 6, 34, 4.9); addO('bike', 6, 124, 4.9);
+  for (var yr = 2; yr < P; yr += rr(5.6, 7.6)) if (!nearCross(yr, 9, 4) && rnd() > 0.25) addO('car', 8.0 + rr(-0.1, 0.1), yr, 0, rr(-0.03, 0.03));
+  for (var yl = 5; yl < P; yl += rr(5.6, 7.6)) if (!nearCross(yl, 4, 9) && rnd() > 0.25) addO('car', -10.0 + rr(-0.1, 0.1), yl, 0, Math.PI + rr(-0.03, 0.03));
+  [10, 55, 100, 150].forEach(function (y) { addO('ped', 10.7, y, 1.3); });
+  [30, 80, 120, 165].forEach(function (y) { addO('ped', 11.5, y, -1.1); });
+  [20, 70, 140].forEach(function (y) { addO('ped', -13.6, y, 1.0); });
+  [45, 95, 160].forEach(function (y) { addO('ped', -14.6, y, -1.4); });
+  [94, 96.2, 98.4, 100.6].forEach(function (y) { addO('barrier', 13.3, y, 0, 0); });
+  [93, 96, 99, 102].forEach(function (y) { addO('cone', 12.5, y, 0, 0); });
+
+  /* ---- LiDAR ground rings, sensor-relative (denser elevations near the horizon) ---- */
+  var NR = 30, ringR = [];
+  for (i = 0; i < NR; i++) ringR.push(1.85 / Math.tan((2.15 + 27.85 * Math.pow(1 - i / (NR - 1), 1.6)) * Math.PI / 180));
+  var rpN = 0, rpX, rpY, rpR, rpJ;
+  (function buildRings() {
+    var step = panel.clientWidth < 600 ? 2 : 1, n = NR * Math.ceil(NB / step), k = 0;
+    rpX = new Float32Array(n); rpY = new Float32Array(n); rpR = new Float32Array(n); rpJ = new Uint16Array(n);
+    for (var a = 0; a < NR; a++) for (var b = 0; b < NB; b += step) {
+      var phi = binPhi(b) + (rnd() - 0.5) * BW * 0.3, r = ringR[a] * (1 + (rnd() - 0.5) * 0.012);
+      rpX[k] = r * Math.sin(phi); rpY[k] = r * Math.cos(phi); rpR[k] = r; rpJ[k] = b; k++;
+    }
+    rpN = k;
+  })();
+
+  /* road paint reflects strongly, so ring returns on it read brighter */
+  function isMark(x, yw) {
+    var m = mod(yw, P), ax = Math.abs;
+    for (var q = 0; q < CROSS.length; q++) {
+      var c = CROSS[q];
+      if ((m > c[0] - 5 && m < c[0] - 1.5) || (m > c[1] + 1.5 && m < c[1] + 5)) return x > CURB_L && x < CURB_R && mod(x, 1.1) < 0.55;
+      if (m > c[0] && m < c[1]) return false;
+    }
+    if (ax(x - 1.75) < 0.13 || ax(x + 5.25) < 0.13) return mod(m, 9) < 3.2;
+    if (ax(x + 1.75) < 0.24) return true;
+    return ax(x - 5.25) < 0.12 || ax(x - 6.75) < 0.1 || ax(x + 8.75) < 0.1;
+  }
+
+  /* how far a ray from the sensor travels before it meets a building */
+  function rayLimit(dx, dy) {
+    if (Math.abs(dx) < 1e-4) return R_MAX + 5;
+    var t = (dx > 0 ? WALL_R : WALL_L) / dx, yw = egoY + dy * t, c = crossAt(yw);
+    if (!c) return t;
+    var lim = (dx > 0 ? SIDE_X : -SIDE_X) / dx;
+    if (Math.abs(dy) > 1e-4) {
+      var base = yw - mod(yw, P), ty = ((dy > 0 ? base + c[1] : base + c[0]) - egoY) / dy;
+      if (ty > t && ty < lim) lim = ty;
+    }
+    return lim;
+  }
+
+  /* ---- state ---- */
+  var mqReduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var reduced = mqReduce.matches;
+  var sweep = -0.4, modeTarget = 0, pulse = 1, clock = 0, hover = null;
+  var PULSE_S = 1.7, WAVE_M = 64;                       // the switch travels outwards from the car as a re-scan
+  function waveR() { if (pulse >= 1) return 1e9; var t = 1 - pulse; return (1 - t * t) * WAVE_M; }
+  var W = 0, H = 0, cx = 0, cy = 0, sc = 10;
+  var colors = {};
+  function readColors() {
+    var cs = getComputedStyle(document.documentElement);
+    ['bg', 'scene', 'ink', 'muted', 'rule', 'signal', 'point', 'car', 'truck', 'ped', 'bike', 'barrier', 'cone'].forEach(function (k) { colors[k] = cs.getPropertyValue('--' + k).trim(); });
+  }
+
+  var B = 6, GROUPS = ['pt', 'mark', 'car', 'truck', 'ped', 'bike', 'barrier', 'cone'], G = {};
+  GROUPS.forEach(function (g) { G[g] = { a: [[], [], [], [], [], []], n: new Int32Array(B) }; });
+  function push(g, I, x, y) {
+    var b = Math.min(B - 1, (I * B) | 0), gg = G[g], n = gg.n[b], arr = gg.a[b];
+    arr[n] = x; arr[n + 1] = y; gg.n[b] = n + 2;
+  }
+
+  function update(dt) {
+    egoY = mod(egoY + EGO_V * dt, P);
+    for (var q = 0; q < objs.length; q++) {
+      var ob = objs[q], f = ob.follow;
+      if (f) ob.y = mod(egoY + f.d + f.amp * Math.sin(clock * f.w + f.ph), P);
+      else if (ob.v) ob.y = mod(ob.y + ob.v * dt, P);
+    }
+    sweep = (sweep + OMEGA * dt) % TAU;
+    clock += dt;
+    if (pulse < 1) pulse = Math.min(1, pulse + dt / PULSE_S);
+  }
+
+  var CORN = [-1, -1, 1, -1, 1, 1, -1, 1];
+  var r3d = null, stats = { nR: 0, nD: 0, conf: 0 };
+  function compute() {
+    var q, o, j, rw = waveR();
+    stats.nR = 0; stats.nD = 0; stats.conf = 0;
+    for (j = 0; j < NB; j++) { limit[j] = rayLimit(binSin[j], binCos[j]); shadow[j] = 1e9; }
+    if (reduced) inten.fill(0.72);
+    else for (j = 0; j < NB; j++) inten[j] = FLOOR + (1 - FLOOR) * Math.exp(-mod(sweep - binPhi(j), TAU) / DECAY);
+
+    for (q = 0; q < objs.length; q++) {
+      o = objs[q];
+      o.rx = o.x; o.ry = wrapRel(o.y - egoY); o.r = Math.hypot(o.rx, o.ry); o.phi = Math.atan2(o.rx, o.ry);
+      o.inRange = o.r < R_MAX + 4;
+      if (!o.inRange) { o.vis = false; continue; }
+      var ssx = cx + o.rx * sc, ssy = cy - o.ry * sc;
+      o.vis = r3d ? true : ssx > -30 && ssx < W + 30 && ssy > -30 && ssy < H + 30;
+      var c = CLS[o.cls];
+      o.tW = 1 - smooth(R_MAX - 6, R_MAX, o.r);
+      o.sW = o.missed ? 0 : 1 - smooth(c.far - 3, c.far + 3, o.r);
+      o.m = pulse >= 1 ? modeTarget : o.m0 + (modeTarget - o.m0) * smooth(o.r - 3, o.r + 3, rw);
+      o.det = o.tW + (o.sW - o.tW) * o.m;
+      o.detT = modeTarget ? o.sW : o.tW;
+      var I = inten[binOf(o.phi)];
+      if (pulse < 1) { var dw = (o.r - rw) / 5; I = Math.min(1, I + (1 - pulse) * Math.exp(-dw * dw)); }
+      o.I = I;
+      // the student's boxes drift and wobble a little; the teacher's stay put
+      var mm = o.m, wob = reduced ? 0 : mm;
+      o.bx = o.rx + o.ndx * mm + Math.sin(clock * 1.9 + o.ph) * 0.12 * wob;
+      o.by = o.ry + o.ndy * mm + Math.cos(clock * 1.4 + o.ph * 1.7) * 0.16 * wob;
+      o.byaw = o.yaw + o.nyaw * mm + Math.sin(clock * 1.2 + o.ph * 0.6) * 0.035 * wob;
+      o.bw = o.w * (1 + o.nsw * mm); o.bl = o.l * (1 + o.nsl * mm);
+      o.ghost = mm * o.tW * o.sW; o.miss = mm * o.tW * (1 - o.sW);
+      o.conf = o.confT + (o.confS - o.confT) * mm;
+      if (o.vis && o.r < RANGE) { stats.nR++; if (o.detT > 0.5) { stats.nD++; stats.conf += modeTarget ? o.confS : o.confT; } }
+      // angular shadow cast on the ground and walls behind it
+      var co = Math.cos(o.yaw), si = Math.sin(o.yaw), hw = o.w / 2, hl = o.l / 2, dmin = 1e9, amin = 1e9, amax = -1e9;
+      for (var k = 0; k < 8; k += 2) {
+        var lx = CORN[k] * hw, ly = CORN[k + 1] * hl, x = o.rx + lx * co + ly * si, y = o.ry - lx * si + ly * co;
+        var d = Math.hypot(x, y), a = normA(Math.atan2(x, y) - o.phi);
+        if (d < dmin) dmin = d; if (a < amin) amin = a; if (a > amax) amax = a;
+      }
+      var sr = Math.max(0.4, dmin - 0.1) + 0.35;
+      var ja = Math.floor((o.phi + amin + Math.PI) / BW), jb = Math.floor((o.phi + amax + Math.PI) / BW);
+      for (j = ja; j <= jb; j++) { var jj = mod(j, NB); if (sr < shadow[jj]) shadow[jj] = sr; }
+    }
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h);
+  }
+  var DASH_GHOST = [4, 3], DASH_MISS = [2, 3];
+  function box(x, y, yaw, w, l, color, alpha, lw, dash, heading) {
+    ctx.save();
+    ctx.translate(cx + x * sc, cy - y * sc); ctx.rotate(yaw);
+    ctx.globalAlpha = Math.min(1, alpha); ctx.strokeStyle = color; ctx.lineWidth = lw;
+    if (dash) ctx.setLineDash(dash);
+    ctx.strokeRect(-w / 2 * sc, -l / 2 * sc, w * sc, l * sc);
+    if (heading) { ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -l / 2 * sc); ctx.stroke(); }
+    ctx.restore();
+  }
+
+  var labels = [], placed = [], elRange = document.getElementById('n-range'), elDet = document.getElementById('n-det'), elConf = document.getElementById('n-conf'), lastRO = 0, shownR = -1, shownD = -1, shownC = '';
+
+  function draw() {
+    if (!W || !H) return;
+    compute();
+    if (r3d) { try { r3d.render(); } catch (e) { r3d = null; panel.classList.remove('is-3d'); draw2D(); } }
+    else draw2D();
+    var now = performance.now(), confTxt = stats.nD ? (stats.conf / stats.nD).toFixed(2) : '0.00';
+    if ((stats.nR !== shownR || stats.nD !== shownD || confTxt !== shownC) && (now - lastRO > 300 || !running)) {
+      elRange.textContent = stats.nR; elDet.textContent = stats.nD; elConf.textContent = confTxt;
+      shownR = stats.nR; shownD = stats.nD; shownC = confTxt; lastRO = now;
+    }
+  }
+
+  function draw2D() {
+    ctx.clearRect(0, 0, W, H);
+    var q, j, o, x, y, sx, sy, r;
+
+    // map layer: lane lines scroll past as the car drives
+    ctx.save(); ctx.strokeStyle = colors.muted; ctx.lineWidth = 1; ctx.globalAlpha = 0.4;
+    [[1.75, 1], [-5.25, 1], [-1.75, 0], [5.25, 0], [9.25, 0], [-11.25, 0]].forEach(function (ln) {
+      ctx.setLineDash(ln[1] ? [3.2 * sc, 5.8 * sc] : []); ctx.lineDashOffset = -egoY * sc;
+      ctx.beginPath(); ctx.moveTo(cx + ln[0] * sc, 0); ctx.lineTo(cx + ln[0] * sc, H); ctx.stroke();
+    });
+    ctx.restore();
+
+    // range rings
+    ctx.globalAlpha = 1; ctx.strokeStyle = colors.rule; ctx.lineWidth = 1; ctx.setLineDash([2, 5]);
+    for (r = 10; r <= 50; r += 10) { ctx.beginPath(); ctx.arc(cx, cy, r * sc, 0, TAU); ctx.stroke(); }
+    ctx.setLineDash([]);
+    ctx.fillStyle = colors.muted; ctx.font = '500 10px Archivo, "Helvetica Neue", Arial, sans-serif'; ctx.textBaseline = 'bottom';
+    for (r = 20; r <= 40; r += 10) ctx.fillText(r + ' m', cx - r * sc + 4, cy - 3);
+
+    // sweep beam with a fading trail
+    if (!reduced) {
+      var R = Math.hypot(W, H), a0 = sweep - Math.PI / 2, N = 14, span = 0.6;
+      ctx.fillStyle = colors.signal;
+      for (q = 0; q < N; q++) {
+        ctx.globalAlpha = 0.09 * (1 - q / N);
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, R, a0 - (q + 1) * span / N, a0 - q * span / N); ctx.closePath(); ctx.fill();
+      }
+      ctx.globalAlpha = 0.6; ctx.strokeStyle = colors.signal; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(a0) * R, cy + Math.sin(a0) * R); ctx.stroke();
+    }
+
+    // ground returns
+    for (q = 0; q < rpN; q++) {
+      j = rpJ[q]; r = rpR[q];
+      if (r > limit[j] || r > shadow[j]) continue;
+      x = rpX[q]; y = rpY[q]; sx = cx + x * sc; sy = cy - y * sc;
+      if (sx < -2 || sx > W + 2 || sy < -2 || sy > H + 2) continue;
+      push(isMark(x, y + egoY) ? 'mark' : 'pt', inten[j], sx, sy);
+    }
+    // buildings, curbs, trees, poles
+    for (q = 0; q < sN; q++) {
+      y = wrapRel(sY[q] - egoY);
+      if (y > R_MAX || y < -R_MAX) continue;
+      x = sX[q]; r = Math.hypot(x, y);
+      if (r > R_MAX || r < 1) continue;
+      var kind = sK[q];
+      if (sH[q] > (kind === 0 ? 22 : 10) / r) continue;
+      j = binOf(Math.atan2(x, y));
+      if (r > limit[j] + (kind === 0 ? 1.4 : kind === 2 ? 2.2 : 0.4)) continue;
+      if (kind !== 2 && r > shadow[j]) continue;
+      sx = cx + x * sc; sy = cy - y * sc;
+      if (sx < -2 || sx > W + 2 || sy < -2 || sy > H + 2) continue;
+      push('pt', inten[j], sx, sy);
+    }
+    // road users: only faces turned towards the sensor return points
+    for (q = 0; q < objs.length; q++) {
+      o = objs[q];
+      if (!o.inRange || !o.vis) continue;
+      var g = o.det > 0.5 ? o.cls : 'pt', co = Math.cos(o.yaw), si = Math.sin(o.yaw), pts = o.pts, dens = Math.min(1, 16 / Math.max(o.r, 1));
+      for (var p = 0; p < pts.length; p += 5) {
+        if (pts[p + 4] > dens) continue;
+        var lx = pts[p], ly = pts[p + 1];
+        x = o.rx + lx * co + ly * si; y = o.ry - lx * si + ly * co;
+        var nx = pts[p + 2] * co + pts[p + 3] * si, ny = -pts[p + 2] * si + pts[p + 3] * co;
+        if (nx * x + ny * y >= 0) continue;
+        sx = cx + x * sc; sy = cy - y * sc;
+        if (sx < -2 || sx > W + 2 || sy < -2 || sy > H + 2) continue;
+        j = binOf(Math.atan2(x, y));
+        if (Math.hypot(x, y) > limit[j] + 0.5) continue;
+        push(g, inten[j], sx, sy);
+      }
+    }
+    // flush point buckets: one path per colour and brightness level
+    for (var gi = 0; gi < GROUPS.length; gi++) {
+      var gname = GROUPS[gi], gg = G[gname];
+      var size = gname === 'pt' ? 1.6 : gname === 'mark' ? 2 : 2.2, half = size / 2;
+      ctx.fillStyle = gname === 'pt' || gname === 'mark' ? colors.point : colors[gname];
+      for (var b = 0; b < B; b++) {
+        var n = gg.n[b]; if (!n) continue;
+        var lvl = (b + 1) / B;
+        ctx.globalAlpha = gname === 'pt' ? 0.9 * lvl : gname === 'mark' ? 0.4 + 0.6 * lvl : 0.25 + 0.75 * lvl;
+        ctx.beginPath();
+        var arr = gg.a[b];
+        for (var e = 0; e < n; e += 2) ctx.rect(arr[e] - half, arr[e + 1] - half, size, size);
+        ctx.fill();
+        gg.n[b] = 0;
+      }
+    }
+
+    // detection boxes
+    labels.length = 0;
+    var rw = waveR();
+    ctx.lineJoin = 'round';
+
+    // re-scan wave after a switch
+    if (pulse < 1) {
+      ctx.globalAlpha = 0.55 * (1 - pulse); ctx.strokeStyle = colors.signal; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(cx, cy, rw * sc, 0, TAU); ctx.stroke();
+      ctx.globalAlpha = 0.06 * (1 - pulse); ctx.fillStyle = colors.signal; ctx.fill();
+    }
+
+    for (q = 0; q < objs.length; q++) {
+      o = objs[q];
+      if (!o.inRange || !o.vis) continue;
+      var I = o.I, hov = o === hover, ghost = o.ghost, miss = o.miss;
+      if (ghost > 0.02) box(o.rx, o.ry, o.yaw, o.w, o.l, colors[o.cls], ghost * (0.3 + 0.35 * I), 1, DASH_GHOST, false);
+      if (miss > 0.02) {
+        box(o.rx, o.ry, o.yaw, o.w, o.l, colors.muted, miss * (0.55 + 0.45 * I), 1.4, DASH_MISS, false);
+        if (miss > 0.5 && LABELED[o.cls] && o.r < 34 && I > 0.6) { o.lab = 'miss'; labels.push(o); }
+      }
+      if (o.det > 0.02) {
+        box(o.bx, o.by, o.byaw, o.bw, o.bl, colors[o.cls], o.det * (hov ? 1 : 0.42 + 0.58 * I), hov ? 2.5 : 1.6, null, o.cls !== 'cone' && o.cls !== 'barrier');
+        if (hov || (I > 0.6 && LABELED[o.cls] && o.r < 36 && o.det > 0.5)) { o.lab = 'det'; labels.push(o); }
+      }
+    }
+
+    // labels, nearest first, skipping any that would collide
+    ctx.font = '600 11px Archivo, "Helvetica Neue", Arial, sans-serif'; ctx.textBaseline = 'middle';
+    labels.sort(function (a, b) { return (b === hover) - (a === hover) || a.r - b.r; });
+    placed.length = 0;
+    for (q = 0; q < labels.length; q++) {
+      o = labels[q];
+      var hv = o === hover && o.lab === 'det', isMiss = o.lab === 'miss', conf = o.confT + (o.confS - o.confT) * o.m;
+      var txt = isMiss ? 'missed ' + CLS[o.cls].label : CLS[o.cls].label + ' ' + conf.toFixed(2) + (hv ? ', ' + Math.round(o.r) + ' m' : '');
+      var tw = ctx.measureText(txt).width + 13, th = 18, ext = Math.max(o.bw, o.bl) / 2 * sc;
+      var lxp = cx + o.bx * sc + ext * 0.72 + 5, lyp = cy - o.by * sc - ext * 0.72 - 5 - th;
+      if (lxp + tw > W - 6) lxp = cx + o.bx * sc - ext * 0.72 - 5 - tw;
+      if (lyp < 56) lyp = cy - o.by * sc + ext * 0.72 + 5;
+      var clash = false;
+      for (var pq = 0; pq < placed.length; pq++) { var pl = placed[pq]; if (lxp < pl[0] + pl[2] && lxp + tw > pl[0] && lyp < pl[1] + pl[3] && lyp + th > pl[1]) { clash = true; break; } }
+      if (clash && !hv) continue;
+      placed.push([lxp, lyp, tw, th]);
+      ctx.globalAlpha = hv ? 1 : Math.min(1, (o.I - 0.5) * 2.6) * (isMiss ? o.m : o.det);
+      ctx.fillStyle = colors.bg; roundRect(lxp, lyp, tw, th, 3); ctx.fill();
+      ctx.fillStyle = isMiss ? colors.muted : colors[o.cls]; ctx.fillRect(lxp, lyp, 3, th);
+      ctx.fillStyle = isMiss ? colors.muted : colors.ink; ctx.fillText(txt, lxp + 8, lyp + th / 2 + 0.5);
+    }
+
+    // ego vehicle and sensor
+    ctx.globalAlpha = 1; ctx.fillStyle = colors.ink;
+    roundRect(cx - 0.95 * sc, cy - 1.8 * sc, 1.9 * sc, 4.6 * sc, 0.4 * sc); ctx.fill();
+    ctx.fillStyle = colors.bg; ctx.globalAlpha = 0.55; ctx.fillRect(cx - 0.75 * sc, cy - 1.15 * sc, 1.5 * sc, 0.35 * sc);
+    ctx.globalAlpha = 1; ctx.fillStyle = colors.signal; ctx.beginPath(); ctx.arc(cx, cy, 2.6, 0, TAU); ctx.fill();
+  }
+
+  /* ---- loop, sizing, visibility ---- */
+  var running = false, raf = 0, last = 0, onScreen = true;
+  function frame(t) {
+    var dt = Math.min(0.05, Math.max(0, (t - last) / 1000)); last = t;
+    raf = requestAnimationFrame(frame);
+    update(dt); draw();
+  }
+  function start() { if (running) return; running = true; last = performance.now(); raf = requestAnimationFrame(frame); }
+  function stop() { running = false; cancelAnimationFrame(raf); }
+  function sync() { if (onScreen && !document.hidden && !reduced) start(); else { stop(); draw(); } }
+
+  function resize() {
+    var rect = panel.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = rect.width; H = rect.height;
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    sc = Math.min(W / 54, H / 56); cx = W * 0.5; cy = H * 0.64;
+    if (r3d) r3d.resize(W, H, dpr);
+    draw();
+  }
+
+  readColors();
+  resize();
+  if ('ResizeObserver' in window) new ResizeObserver(resize).observe(panel); else addEventListener('resize', resize);
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (en) { onScreen = en[0].isIntersecting; sync(); }).observe(panel);
+  document.addEventListener('visibilitychange', sync);
+  mqReduce.addEventListener && mqReduce.addEventListener('change', function () { reduced = mqReduce.matches; sync(); });
+  var reTheme = function () { readColors(); if (r3d) r3d.theme(); if (!running) draw(); };
+  var mqDark = matchMedia('(prefers-color-scheme: dark)');
+  mqDark.addEventListener && mqDark.addEventListener('change', reTheme);
+  new MutationObserver(reTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (!running) draw(); });
+  sync();
+
+  // teacher / student toggle
+  var note = document.getElementById('mode-note');
+  var NOTES = [
+    'Teacher: BEVFusion, the full-size camera and LiDAR model. Boxes are tight, steady and confident.',
+    'Student: YOLO + PointPillars at 5.5M parameters. Solid boxes are its guesses, dashed outlines show where the teacher put them, and grey outlines are objects it missed.'
+  ];
+  var figure = panel.parentElement, buttons = document.querySelectorAll('.seg button');
+  buttons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var target = +btn.getAttribute('data-mode');
+      if (target === modeTarget) return;
+      for (var q = 0; q < objs.length; q++) objs[q].m0 = objs[q].m;
+      modeTarget = target;
+      pulse = running ? 0 : 1;
+      buttons.forEach(function (b2) { b2.setAttribute('aria-pressed', String(b2 === btn)); });
+      figure.classList.toggle('is-student', target === 1);
+      note.textContent = NOTES[target];
+      if (!running) draw();
+    });
+  });
+
+  // hover a box to see its distance
+  function pick(clientX, clientY) {
+    var rect = canvas.getBoundingClientRect(), mx = (clientX - rect.left - cx) / sc, my = (cy - (clientY - rect.top)) / sc, best = null, bd = 1e9;
+    for (var q = 0; q < objs.length; q++) {
+      var o = objs[q];
+      if (!o.inRange || !o.vis || o.det < 0.3 || !o.bw) continue;
+      var dx = mx - o.bx, dy = my - o.by, co = Math.cos(o.byaw), si = Math.sin(o.byaw);
+      var lx = dx * co - dy * si, ly = dx * si + dy * co;
+      if (Math.abs(lx) < o.bw / 2 + 0.7 && Math.abs(ly) < o.bl / 2 + 0.7) { var d = Math.hypot(dx, dy); if (d < bd) { bd = d; best = o; } }
+    }
+    if (best !== hover) { hover = best; canvas.style.cursor = best ? 'crosshair' : ''; if (!running) draw(); }
+  }
+  canvas.addEventListener('pointermove', function (e) { if (!r3d) pick(e.clientX, e.clientY); });
+  canvas.addEventListener('pointerdown', function (e) { if (!r3d) pick(e.clientX, e.clientY); });
+  canvas.addEventListener('pointerleave', function () { hover = null; canvas.style.cursor = ''; if (!running) draw(); });
+
+  // hooks for the 3D view, which loads Three.js after the page is up
+  window.__bev = {
+    objs: objs, CLS: CLS, LABELED: LABELED, panel: panel, colors: colors,
+    limit: limit, shadow: shadow, binOf: binOf, isMark: isMark, wrapRel: wrapRel, R_MAX: R_MAX,
+    ring: { x: rpX, y: rpY, r: rpR, j: rpJ, n: rpN },
+    struct: { x: sX, y: sY, h: sH, k: sK, n: sN },
+    state: function () { return { egoY: egoY, sweep: sweep, pulse: pulse, wave: waveR(), clock: clock, reduced: reduced, running: running, W: W, H: H }; },
+    attach: function (view) {
+      r3d = view; hover = null;
+      view.resize(W, H, Math.min(2, window.devicePixelRatio || 1));
+      draw();
+      panel.classList.add('is-3d');
+    },
+    redraw: function () { if (!running) draw(); }
+  };
+})();
+
+/* ---------- scroll reveals ---------- */
+(function () {
+  var els = [].slice.call(document.querySelectorAll('[data-reveal]'));
+  var motion = 'IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var races = document.getElementById('races');
+
+  // the prediction window walks forward through the season once, then rests
+  function walkRaces() {
+    var cells = races.children, k = 4;
+    function paint(t) { for (var i = 0; i < cells.length; i++) cells[i].className = i < t ? 'used' : i === t ? 'target' : ''; }
+    paint(k);
+    var id = setInterval(function () { k++; paint(k); if (k >= 10) clearInterval(id); }, 420);
+  }
+  function reveal(el) {
+    el.classList.remove('is-pending'); el.classList.add('is-in');
+    if (motion && races && el.contains(races)) setTimeout(walkRaces, 500);
+  }
+  if (!motion) { els.forEach(reveal); return; }
+  document.documentElement.classList.add('motion');
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { if (e.isIntersecting) { reveal(e.target); io.unobserve(e.target); } });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.15 });
+  els.forEach(function (el) {
+    if (el.getBoundingClientRect().top < window.innerHeight * 0.92) requestAnimationFrame(function () { reveal(el); });
+    else { el.classList.add('is-pending'); io.observe(el); }
+  });
+})();
+</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+/* 3D view of the same simulation, drawn with Three.js. If WebGL2 or the library is unavailable, the 2D view stays. */
+const bev = window.__bev;
+if (bev && window.WebGL2RenderingContext) {
+  Promise.all([
+    import('three'),
+    import('three/addons/lines/LineSegments2.js'),
+    import('three/addons/lines/LineSegmentsGeometry.js'),
+    import('three/addons/lines/LineMaterial.js')
+  ]).then(([THREE, a, b, c]) => {
+    const view = createView(THREE, a.LineSegments2, b.LineSegmentsGeometry, c.LineMaterial, bev);
+    if (view) bev.attach(view);
+  }).catch(() => { /* keep the 2D view */ });
+}
+
+const PTS_VS = `
+attribute float kind;
+uniform float uSweep; uniform float uStatic; uniform float uFocal; uniform float uDpr;
+uniform vec3 uColors[9]; uniform vec3 uTint;
+varying vec3 vColor; varying float vAlpha;
+void main() {
+  vec4 mv = modelViewMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * mv;
+  float phi = atan(position.x, -position.z);
+  float d = mod(uSweep - phi, 6.28318530718);
+  float I = uStatic > 0.5 ? 0.78 : 0.2 + 0.8 * exp(-d / 1.55);
+  int k = int(kind + 0.5);
+  vec3 c = uColors[k];
+  if (k == 2) c = mix(c, uTint, clamp(position.y / 11.0, 0.0, 1.0) * 0.75);
+  vColor = c;
+  float a = k >= 3 ? 0.35 + 0.65 * I : 0.92 * I;
+  if (k == 1) a = 0.5 + 0.5 * I;
+  float dist = -mv.z;
+  vAlpha = a * (1.0 - smoothstep(70.0, 125.0, dist));
+  float world = k >= 3 ? 0.14 : 0.11;
+  gl_PointSize = clamp(world * uFocal / dist, 1.4, 5.5) * uDpr;
+}`;
+const PTS_FS = `
+varying vec3 vColor; varying float vAlpha;
+void main() {
+  vec2 p = gl_PointCoord - 0.5; float r2 = dot(p, p);
+  if (r2 > 0.25) discard;
+  gl_FragColor = vec4(vColor, vAlpha * (1.0 - smoothstep(0.14, 0.25, r2)));
+}`;
+const GROUND_VS = `
+varying vec2 vP;
+void main() { vP = position.xy; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
+const GROUND_FS = `
+uniform float uSweep; uniform float uStatic; uniform float uWave; uniform float uWaveA; uniform float uEgoY;
+uniform vec3 uSignal; uniform vec3 uRule; uniform vec3 uMap;
+varying vec2 vP;
+float lineAt(float v, float c, float w, float f) { return 1.0 - smoothstep(w, w + f * 1.5, abs(v - c)); }
+float inSpan(float m, float a, float b) { return step(a, m) * step(m, b); }
+void main() {
+  float r = length(vP);
+  float phi = atan(vP.x, vP.y);
+  float fw = fwidth(r);
+  float rr = abs(mod(r + 5.0, 10.0) - 5.0);
+  float ring = (1.0 - smoothstep(fw * 0.5, fw * 1.3, rr)) * step(5.0, r) * (1.0 - smoothstep(47.0, 52.0, r));
+  float ra = ring * step(0.42, fract(phi * r / 1.2)) * 0.6;
+  float sa = 0.0;
+  if (uStatic < 0.5) {
+    float d = mod(uSweep - phi, 6.28318530718);
+    sa += 0.14 * exp(-d / 0.3) * (1.0 - smoothstep(25.0, 70.0, r));
+    float ang = phi - uSweep;
+    float dl = r * abs(sin(ang));
+    float fl = fwidth(dl);
+    sa += 0.6 * (1.0 - smoothstep(fl * 0.6, fl * 1.7, dl)) * step(0.0, cos(ang)) * (1.0 - smoothstep(35.0, 75.0, r));
+  }
+  if (uWaveA > 0.0) {
+    sa += uWaveA * 0.85 * (1.0 - smoothstep(fw * 1.5, fw * 3.0 + 0.25, abs(r - uWave)));
+    sa += uWaveA * 0.08 * step(r, uWave);
+  }
+  // HD-map layer in world coordinates, so lane lines and crossings flow past as the car drives
+  float x = vP.x, yw = vP.y + uEgoY, m = mod(yw, 180.0), fx = fwidth(x), fy = fwidth(yw);
+  float junction = max(inSpan(m, 54.0, 68.0), inSpan(m, 128.0, 140.0));
+  float mouth = max(inSpan(m, 56.5, 65.5), inSpan(m, 130.5, 137.5));
+  float dash = step(mod(yw, 9.0), 3.2);
+  float ma = 0.0;
+  ma = max(ma, (lineAt(x, 1.75, 0.07, fx) + lineAt(x, -5.25, 0.07, fx)) * dash * (1.0 - junction));
+  ma = max(ma, (lineAt(x, -1.62, 0.05, fx) + lineAt(x, -1.88, 0.05, fx) + lineAt(x, 5.25, 0.05, fx) + lineAt(x, 6.75, 0.04, fx) + lineAt(x, -8.75, 0.04, fx)) * (1.0 - junction));
+  ma = max(ma, (lineAt(x, 9.25, 0.05, fx) + lineAt(x, -11.25, 0.05, fx)) * (1.0 - mouth));
+  float outside = max(step(9.25, x), step(x, -11.25)) * step(abs(x), 42.0);
+  ma = max(ma, outside * (lineAt(m, 56.5, 0.07, fy) + lineAt(m, 65.5, 0.07, fy) + lineAt(m, 130.5, 0.07, fy) + lineAt(m, 137.5, 0.07, fy)));
+  float cw = max(max(inSpan(m, 49.0, 52.5), inSpan(m, 69.5, 73.0)), max(inSpan(m, 123.0, 126.5), inSpan(m, 141.5, 145.0)));
+  ma = max(ma, cw * step(-11.25, x) * step(x, 9.25) * step(mod(x, 1.1), 0.55) * 0.55);
+  ma = clamp(ma, 0.0, 1.0) * 0.36 * (1.0 - smoothstep(32.0, 56.0, r));
+  sa = min(sa, 1.0);
+  float a = 1.0 - (1.0 - ra) * (1.0 - ma) * (1.0 - sa);
+  if (a < 0.004) discard;
+  gl_FragColor = vec4((uRule * ra + uMap * ma + uSignal * sa) / max(ra + ma + sa, 1e-4), a);
+}`;
+
+function createView(THREE, LineSegments2, LineSegmentsGeometry, LineMaterial, bev) {
+  THREE.ColorManagement.enabled = false;
+  const panel = bev.panel, ui = panel.querySelector('.scene-ui');
+  const glc = document.createElement('canvas'); glc.className = 'bev-gl'; glc.setAttribute('aria-hidden', 'true');
+  const lab = document.createElement('canvas'); lab.className = 'bev-labels'; lab.setAttribute('aria-hidden', 'true');
+  const context = glc.getContext('webgl2', { antialias: true, alpha: true, premultipliedAlpha: true });
+  if (!context) return null;
+  panel.insertBefore(glc, ui); panel.insertBefore(lab, ui);
+
+  const renderer = new THREE.WebGLRenderer({ canvas: glc, context, antialias: true, alpha: true });
+  renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+  renderer.setClearColor(0x000000, 0);
+  const lctx = lab.getContext('2d');
+  const scene = new THREE.Scene();
+  const FOV = 38;
+  const camera = new THREE.PerspectiveCamera(FOV, 1, 0.5, 400);
+  const target = new THREE.Vector3(0, 0, -6);
+  const col = (k) => new THREE.Color(bev.colors[k] || '#888888');
+  const CLASSES = ['car', 'truck', 'ped', 'bike', 'barrier', 'cone'];
+  const KIND = { car: 3, truck: 4, ped: 5, bike: 6, barrier: 7, cone: 8 };
+  const HEIGHT = { car: 1.6, truck: 3.4, ped: 1.75, bike: 1.3, barrier: 1.0, cone: 0.75 };
+  const classColor = {}; CLASSES.forEach((k) => { classColor[k] = col(k); });
+  const muted = col('muted');
+  let W = 1, H = 1, dpr = 1, dist = 56;
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a94a3, 1.15));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.9); sun.position.set(6, 12, 8); scene.add(sun);
+
+  // ground: range rings, sweep beam and the re-scan wave, all in one shader
+  const groundMat = new THREE.ShaderMaterial({
+    uniforms: { uSweep: { value: 0 }, uStatic: { value: 0 }, uWave: { value: 0 }, uWaveA: { value: 0 }, uSignal: { value: col('signal') }, uRule: { value: col('rule') }, uMap: { value: col('muted') }, uEgoY: { value: 0 } },
+    vertexShader: GROUND_VS, fragmentShader: GROUND_FS, transparent: true, depthWrite: false, side: THREE.DoubleSide
+  });
+  const ground = new THREE.Mesh(new THREE.CircleGeometry(80, 192), groundMat);
+  ground.rotation.x = -Math.PI / 2; ground.position.y = 0.01; ground.renderOrder = 0; scene.add(ground);
+
+  // point cloud, rebuilt every frame from the simulation
+  const MAXP = 140000;
+  const pos = new Float32Array(MAXP * 3), knd = new Float32Array(MAXP);
+  const pgeo = new THREE.BufferGeometry();
+  const pAttr = new THREE.BufferAttribute(pos, 3).setUsage(THREE.DynamicDrawUsage);
+  const kAttr = new THREE.BufferAttribute(knd, 1).setUsage(THREE.DynamicDrawUsage);
+  pgeo.setAttribute('position', pAttr); pgeo.setAttribute('kind', kAttr);
+  const KEYS = ['point', 'point', 'point'].concat(CLASSES);
+  const pMat = new THREE.ShaderMaterial({
+    uniforms: { uSweep: { value: 0 }, uStatic: { value: 0 }, uFocal: { value: 500 }, uDpr: { value: 1 }, uColors: { value: KEYS.map(col) }, uTint: { value: col('signal') } },
+    vertexShader: PTS_VS, fragmentShader: PTS_FS, transparent: true, depthWrite: false
+  });
+  const cloud = new THREE.Points(pgeo, pMat); cloud.frustumCulled = false; cloud.renderOrder = 1; scene.add(cloud);
+
+  // 32-beam sensor: walls and road users show up as horizontal scan lines
+  const NBEAM = 32, SENSOR_H = 1.85, tanE = new Float32Array(NBEAM);
+  for (let i = 0; i < NBEAM; i++) tanE[i] = Math.tan((-30.67 + i * 1.333) * Math.PI / 180);
+  const DEG = 180 / Math.PI;
+  let lo = 0, hi = -1;
+  function beams(r, zmin, zmax) {
+    lo = Math.max(0, Math.ceil((Math.atan((zmin - SENSOR_H) / r) * DEG + 30.67) / 1.333));
+    hi = Math.min(NBEAM - 1, Math.floor((Math.atan((zmax - SENSOR_H) / r) * DEG + 30.67) / 1.333));
+  }
+  let n = 0;
+  function push(x, z, y, k) { if (n >= MAXP) return; const i3 = n * 3; pos[i3] = x; pos[i3 + 1] = z; pos[i3 + 2] = -y; knd[n] = k; n++; }
+  function emit(st) {
+    n = 0;
+    const lim = bev.limit, sha = bev.shadow, binOf = bev.binOf, isMark = bev.isMark, wrapRel = bev.wrapRel, RM = bev.R_MAX, egoY = st.egoY;
+    const R = bev.ring;
+    for (let i = 0; i < R.n; i++) {
+      const j = R.j[i], r = R.r[i];
+      if (r > lim[j] || r > sha[j]) continue;
+      const x = R.x[i], y = R.y[i];
+      push(x, 0.03, y, isMark(x, y + egoY) ? 1 : 0);
+    }
+    const S = bev.struct;
+    for (let i = 0; i < S.n; i++) {
+      const y = wrapRel(S.y[i] - egoY);
+      if (y > RM || y < -RM) continue;
+      const x = S.x[i], r = Math.hypot(x, y);
+      if (r > RM || r < 1) continue;
+      const k = S.k[i], h = S.h[i];
+      if (h > (k === 0 ? 22 : 10) / r) continue;
+      const j = binOf(Math.atan2(x, y));
+      if (r > lim[j] + (k === 0 ? 1.4 : k === 2 ? 2.2 : 0.4)) continue;
+      const hidden = r > sha[j];
+      if (k === 1) { if (!hidden) push(x, 0.14, y, 2); continue; }
+      if (k === 2) { push(x, 2.6 + ((h * 97.13) % 1) * 3.6, y, 2); continue; }
+      beams(r, hidden ? 2.4 : 0.25, k === 0 ? 16 : 5.5);
+      for (let b = lo; b <= hi; b++) {
+        const z = SENSOR_H + r * tanE[b];
+        if (((h * (b + 1) * 9.137) % 1) > 0.72) continue;
+        push(x, z, y, 2);
+      }
+    }
+    const objs = bev.objs;
+    for (let q = 0; q < objs.length; q++) {
+      const o = objs[q];
+      if (!o.inRange) continue;
+      const kk = o.det > 0.5 ? KIND[o.cls] : 2, hMax = HEIGHT[o.cls];
+      const co = Math.cos(o.yaw), si = Math.sin(o.yaw), pts = o.pts, dens = Math.min(1, 16 / Math.max(o.r, 1));
+      for (let p = 0; p < pts.length; p += 5) {
+        const hs = pts[p + 4];
+        if (hs > dens) continue;
+        const lx = pts[p], ly = pts[p + 1];
+        const x = o.rx + lx * co + ly * si, y = o.ry - lx * si + ly * co;
+        const nx = pts[p + 2] * co + pts[p + 3] * si, ny = -pts[p + 2] * si + pts[p + 3] * co;
+        if (nx * x + ny * y >= 0) continue;
+        const r = Math.hypot(x, y), j = binOf(Math.atan2(x, y));
+        if (r > lim[j] + 0.5) continue;
+        beams(r, 0.12, hMax);
+        for (let b = lo; b <= hi; b++) {
+          const z = SENSOR_H + r * tanE[b];
+          if (((hs * (b + 3) * 5.771) % 1) > 0.8) continue;
+          push(x, z, y, kk);
+        }
+      }
+    }
+    pgeo.setDrawRange(0, n);
+    [[pAttr, 3], [kAttr, 1]].forEach(([attr, size]) => {
+      if (attr.clearUpdateRanges) { attr.clearUpdateRanges(); attr.addUpdateRange(0, n * size); }
+      attr.needsUpdate = true;
+    });
+  }
+
+  // 3D boxes: solid for the active model, dashed for the teacher's reference and for misses
+  function boxPositions(w, h, l, heading) {
+    const x = w / 2, z = l / 2, out = [];
+    const c = [[-x, 0, -z], [x, 0, -z], [x, 0, z], [-x, 0, z], [-x, h, -z], [x, h, -z], [x, h, z], [-x, h, z]];
+    [[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [5, 6], [6, 7], [7, 4], [0, 4], [1, 5], [2, 6], [3, 7]].forEach(([i, j]) => { out.push(...c[i], ...c[j]); });
+    if (heading) out.push(0, h, 0, 0, h, -z, -x, h, -z, 0, h, -z * 0.55, x, h, -z, 0, h, -z * 0.55);
+    return out;
+  }
+  const geoHead = new LineSegmentsGeometry().setPositions(boxPositions(1, 1, 1, true));
+  const geoPlain = new LineSegmentsGeometry().setPositions(boxPositions(1, 1, 1, false));
+  const fillGeo = new THREE.BoxGeometry(1, 1, 1); fillGeo.translate(0, 0.5, 0);
+  const lineMats = [];
+  const lineMat = (opts) => { const m = new LineMaterial(Object.assign({ color: 0xffffff, transparent: true, depthWrite: false }, opts)); lineMats.push(m); return m; };
+  const views = bev.objs.map((o) => {
+    const h = HEIGHT[o.cls], head = o.cls !== 'cone' && o.cls !== 'barrier';
+    const solid = new LineSegments2(head ? geoHead : geoPlain, lineMat({ linewidth: 1.8 }));
+    const fill = new THREE.Mesh(fillGeo, new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, opacity: 0.1 }));
+    const tg = new LineSegmentsGeometry().setPositions(boxPositions(o.w, h, o.l, false));
+    const ghost = new LineSegments2(tg, lineMat({ linewidth: 1.3, dashed: true, dashSize: 0.32, gapSize: 0.22 }));
+    ghost.computeLineDistances();
+    const miss = new LineSegments2(tg, lineMat({ linewidth: 1.6, dashed: true, dashSize: 0.16, gapSize: 0.16 }));
+    [solid, fill, ghost, miss].forEach((m) => { m.visible = false; m.renderOrder = 2; scene.add(m); });
+    return { o, h, solid, fill, ghost, miss };
+  });
+  function updateBoxes() {
+    for (let i = 0; i < views.length; i++) {
+      const v = views[i], o = v.o, on = o.inRange, c = classColor[o.cls];
+      const sS = on && o.det > 0.02, sG = on && o.ghost > 0.02, sM = on && o.miss > 0.02;
+      v.solid.visible = v.fill.visible = sS; v.ghost.visible = sG; v.miss.visible = sM;
+      if (sS) {
+        v.solid.position.set(o.bx, 0, -o.by); v.solid.rotation.y = -o.byaw; v.solid.scale.set(o.bw, v.h, o.bl);
+        v.fill.position.copy(v.solid.position); v.fill.rotation.y = -o.byaw; v.fill.scale.copy(v.solid.scale);
+        v.solid.material.color.copy(c); v.solid.material.opacity = Math.min(1, o.det * (0.5 + 0.5 * o.I));
+        v.fill.material.color.copy(c); v.fill.material.opacity = o.det * (0.06 + 0.13 * o.I);
+      }
+      if (sG) { v.ghost.position.set(o.rx, 0, -o.ry); v.ghost.rotation.y = -o.yaw; v.ghost.material.color.copy(c); v.ghost.material.opacity = Math.min(1, o.ghost * (0.45 + 0.4 * o.I)); }
+      if (sM) { v.miss.position.set(o.rx, 0, -o.ry); v.miss.rotation.y = -o.yaw; v.miss.material.color.copy(muted); v.miss.material.opacity = Math.min(1, o.miss * (0.65 + 0.35 * o.I)); }
+    }
+  }
+
+  // ego car with the sensor on its roof
+  const egoMat = new THREE.MeshLambertMaterial({ color: col('ink') });
+  const cabMat = new THREE.MeshLambertMaterial({ color: col('ink') });
+  const sensorMat = new THREE.MeshBasicMaterial({ color: col('signal') });
+  const body = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.9, 4.6), egoMat); body.position.set(0, 0.75, 0.5);
+  const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.64, 0.6, 2.5), cabMat); cabin.position.set(0, 1.5, 0.75);
+  const sensor = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.32, 0.32, 24), sensorMat); sensor.position.set(0, 1.96, 0);
+  const wheelGeo = new THREE.CylinderGeometry(0.34, 0.34, 0.26, 20); wheelGeo.rotateZ(Math.PI / 2);
+  [[-0.98, -0.95], [0.98, -0.95], [-0.98, 1.95], [0.98, 1.95]].forEach(([wx, wz]) => { const w = new THREE.Mesh(wheelGeo, egoMat); w.position.set(wx, 0.34, wz); scene.add(w); });
+  scene.add(body, cabin, sensor);
+
+  // drag to orbit; the camera also drifts slowly on its own
+  let userAz = -0.38, userEl = 0, dragging = false, lastX = 0, lastY = 0;
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  glc.addEventListener('pointerdown', (e) => { dragging = true; lastX = e.clientX; lastY = e.clientY; try { glc.setPointerCapture(e.pointerId); } catch (_) {} glc.classList.add('is-drag'); });
+  glc.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    userAz -= (e.clientX - lastX) * 0.006; userEl = clamp(userEl + (e.clientY - lastY) * 0.004, -0.36, 0.62);
+    lastX = e.clientX; lastY = e.clientY; bev.redraw();
+  });
+  const endDrag = () => { dragging = false; glc.classList.remove('is-drag'); };
+  glc.addEventListener('pointerup', endDrag); glc.addEventListener('pointercancel', endDrag);
+
+  function placeCamera(st) {
+    const t = st.clock, still = st.reduced;
+    const az = userAz + (still ? 0 : 0.36 * Math.sin(t * 0.1));
+    const el = clamp(0.64 + userEl + (still ? 0 : 0.05 * Math.sin(t * 0.07)), 0.2, 1.25);
+    camera.position.set(target.x + Math.sin(az) * Math.cos(el) * dist, Math.sin(el) * dist, target.z + Math.cos(az) * Math.cos(el) * dist);
+    camera.lookAt(target);
+  }
+
+  // labels are drawn in 2D over the WebGL canvas, so they stay crisp
+  const v3 = new THREE.Vector3(), placed = [];
+  function project(x, y, z) {
+    v3.set(x, y, z).project(camera);
+    if (v3.z > 1 || v3.z < -1) return null;
+    return [(v3.x * 0.5 + 0.5) * W, (-v3.y * 0.5 + 0.5) * H];
+  }
+  function pill(x, y, w, h, r) { lctx.beginPath(); if (lctx.roundRect) lctx.roundRect(x, y, w, h, r); else lctx.rect(x, y, w, h); }
+  function drawLabels() {
+    const C = bev.colors;
+    lctx.setTransform(dpr, 0, 0, dpr, 0, 0); lctx.clearRect(0, 0, W, H);
+    lctx.font = '500 10px Archivo, "Helvetica Neue", Arial, sans-serif'; lctx.textBaseline = 'middle'; lctx.fillStyle = C.muted; lctx.globalAlpha = 0.95;
+    [10, 20, 30, 40].forEach((r) => { const p = project(-r, 0, 0); if (p && p[1] > 60) lctx.fillText(r + ' m', p[0] + 4, p[1] - 7); });
+    const list = [];
+    bev.objs.forEach((o) => {
+      if (!o.inRange || !bev.LABELED[o.cls]) return;
+      if (o.miss > 0.5 && o.r < 34 && o.I > 0.6) list.push([o, true]);
+      else if (o.det > 0.5 && o.r < 38 && o.I > 0.6) list.push([o, false]);
+    });
+    list.sort((a, b) => a[0].r - b[0].r);
+    placed.length = 0;
+    lctx.font = '600 11px Archivo, "Helvetica Neue", Arial, sans-serif';
+    for (const [o, isMiss] of list) {
+      const p = project(isMiss ? o.rx : o.bx, HEIGHT[o.cls] + 0.2, -(isMiss ? o.ry : o.by));
+      if (!p || p[0] < 0 || p[0] > W || p[1] < 0 || p[1] > H) continue;
+      const txt = isMiss ? 'missed ' + bev.CLS[o.cls].label : bev.CLS[o.cls].label + ' ' + o.conf.toFixed(2);
+      const tw = lctx.measureText(txt).width + 13, th = 18;
+      let lx = p[0] + 8, ly = p[1] - th - 10;
+      if (lx + tw > W - 6) lx = p[0] - tw - 8;
+      if (ly < 58) continue;
+      let clash = false;
+      for (const q of placed) if (lx < q[0] + q[2] && lx + tw > q[0] && ly < q[1] + q[3] && ly + th > q[1]) { clash = true; break; }
+      if (clash) continue;
+      placed.push([lx, ly, tw, th]);
+      const stripe = isMiss ? C.muted : C[o.cls];
+      lctx.globalAlpha = Math.min(1, (o.I - 0.5) * 2.6) * (isMiss ? o.m : o.det);
+      lctx.strokeStyle = stripe; lctx.lineWidth = 1;
+      lctx.beginPath(); lctx.moveTo(p[0], p[1]); lctx.lineTo(lx < p[0] ? lx + tw : lx, ly + th); lctx.stroke();
+      lctx.fillStyle = C.bg; pill(lx, ly, tw, th, 3); lctx.fill();
+      lctx.fillStyle = stripe; lctx.fillRect(lx, ly, 3, th);
+      lctx.fillStyle = isMiss ? C.muted : C.ink; lctx.fillText(txt, lx + 8, ly + th / 2 + 0.5);
+    }
+    lctx.globalAlpha = 1;
+  }
+
+  function render() {
+    const st = bev.state();
+    emit(st); updateBoxes(); placeCamera(st);
+    const still = st.reduced ? 1 : 0;
+    pMat.uniforms.uSweep.value = st.sweep; pMat.uniforms.uStatic.value = still;
+    groundMat.uniforms.uSweep.value = st.sweep; groundMat.uniforms.uStatic.value = still;
+    groundMat.uniforms.uWaveA.value = st.pulse < 1 ? 1 - st.pulse : 0;
+    groundMat.uniforms.uWave.value = st.pulse < 1 ? st.wave : 0;
+    groundMat.uniforms.uEgoY.value = st.egoY;
+    renderer.render(scene, camera);
+    drawLabels();
+  }
+  function resize(w, h, d) {
+    W = Math.max(1, w); H = Math.max(1, h); dpr = d;
+    renderer.setPixelRatio(d); renderer.setSize(W, H, false);
+    lab.width = Math.round(W * d); lab.height = Math.round(H * d);
+    camera.aspect = W / H; camera.updateProjectionMatrix();
+    dist = camera.aspect < 1 ? 70 / Math.sqrt(camera.aspect) : 68;
+    pMat.uniforms.uFocal.value = (H / 2) / Math.tan(FOV * Math.PI / 360);
+    pMat.uniforms.uDpr.value = d;
+    lineMats.forEach((m) => m.resolution.set(W, H));
+  }
+  function theme() {
+    KEYS.forEach((k, i) => pMat.uniforms.uColors.value[i].set(bev.colors[k]));
+    pMat.uniforms.uTint.value.set(bev.colors.signal);
+    groundMat.uniforms.uSignal.value.set(bev.colors.signal); groundMat.uniforms.uRule.value.set(bev.colors.rule); groundMat.uniforms.uMap.value.set(bev.colors.muted);
+    CLASSES.forEach((k) => classColor[k].set(bev.colors[k])); muted.set(bev.colors.muted);
+    egoMat.color.set(bev.colors.ink); cabMat.color.set(bev.colors.ink).lerp(new THREE.Color(bev.colors.scene || bev.colors.bg), 0.22); sensorMat.color.set(bev.colors.signal);
+  }
+  theme();
+  return { render, resize, theme };
+}
+</script>
+</body>
+</html>
